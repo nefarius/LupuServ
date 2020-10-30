@@ -32,9 +32,9 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
   - Add a balance of at least 15€ (as of time of writing) to unlock the Messaging gateway channel (which allows sending messages)
 - Build and deploy this solution to a system of your choice
   - For example, install the .NET Core 3.1 runtime for ARM32 on a Raspberry Pi 2 and use the provided systemd service file to permanently run it as a daemon. There's plenty documentation out there on how to do that so I will not go into details here.
+- Rename `appsettings.example.json` to `appsettings.json`, adjust content according to your environment and restart the service 
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI so it might look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
-- Adjust the `appsettings.json` according to your environment and restart the service
 - You can use the Test E-Mail function and should be able to see it appear in the logs
 
 ## Logging
