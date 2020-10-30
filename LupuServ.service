@@ -1,0 +1,18 @@
+﻿[Unit]
+Description=E-Mail to SMS Gateway service for Lupusec XT1 alarm system
+
+[Service]
+Type=notify
+WorkingDirectory=/home/pi/LupuServ
+ExecStart=/home/pi/dotnet/dotnet /home/pi/LupuServ/LupuServ.dll
+SyslogIdentifier=LupuServ
+
+User=pi
+
+Restart=always
+RestartSec=5
+
+Environment=DOTNET_ROOT=/home/pi/dotnet
+
+[Install]
+WantedBy=multi-user.target
