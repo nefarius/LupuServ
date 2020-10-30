@@ -30,6 +30,7 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
 - Register an account with [CM.com](https://www.cm.com/)
   - Don't forget to respond to verification SMS and mail
   - Add a balance of at least 15€ (as of time of writing) to unlock the Messaging gateway channel (which allows sending messages)
+  - Get the Product token/API key for the Messaging gateway
 - Build and deploy this solution to a system of your choice
   - For example, install the .NET Core 3.1 runtime for ARM32 on a Raspberry Pi 2 and use the provided systemd service file to permanently run it as a daemon. There's plenty documentation out there on how to do that so I will not go into details here.
 - Rename `appsettings.example.json` to `appsettings.json`, adjust content according to your environment and restart the service 
