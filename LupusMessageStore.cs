@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Buffers;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CM.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MimeKit;
 using SmtpServer;
-using SmtpServer.Mail;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
 
@@ -25,15 +25,23 @@ namespace LupuServ
 
         public ILogger<Worker> Logger { get; }
 
-        public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction,
+        public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, ReadOnlySequence<byte> buffer,
             CancellationToken cancellationToken)
         {
             var statusUser = Config.GetSection("StatusUser").Value;
             var alarmUser = Config.GetSection("AlarmUser").Value;
+            
+            await using var stream = new MemoryStream();
 
-            var textMessage = (ITextMessage) transaction.Message;
+            var position = buffer.GetPosition(0);
+            while (buffer.TryGet(ref position, out var memory))
+            {
+                await stream.WriteAsync(memory, cancellationToken);
+            }
 
-            var message = MimeMessage.Load(textMessage.Content);
+            stream.Position = 0;
+
+            var message = await MimeKit.MimeMessage.LoadAsync(stream, cancellationToken);
 
             var user = transaction.To.First().User;
 
@@ -63,12 +71,12 @@ namespace LupuServ
                 {
                     Logger.LogInformation($"Successfully sent the following message to recipients: {message.TextBody}");
 
-                    return await Task.FromResult(SmtpResponse.Ok);
+                    return SmtpResponse.Ok;
                 }
 
                 Logger.LogError($"Message delivery failed: {result.statusMessage} ({result.statusCode})");
 
-                return await Task.FromResult(SmtpResponse.TransactionFailed);
+                return SmtpResponse.TransactionFailed;
             }
 
             if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
@@ -76,7 +84,7 @@ namespace LupuServ
             else
                 Logger.LogWarning($"Unknown message received (maybe a test?): {message.TextBody}");
 
-            return await Task.FromResult(SmtpResponse.Ok);
+            return SmtpResponse.Ok;
         }
     }
 }

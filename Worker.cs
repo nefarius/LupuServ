@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmtpServer;
+using SmtpServer.ComponentModel;
 
 namespace LupuServ
 {
@@ -30,15 +31,18 @@ namespace LupuServ
 
                 var port = int.Parse(config.GetSection("Port").Value);
 
+                var serviceProvider = new ServiceProvider();
+                serviceProvider.Add(new LupusMessageStore(config, _logger));
+
                 var options = new SmtpServerOptionsBuilder()
                     .ServerName("localhost")
                     .Port(port)
-                    .MessageStore(new LupusMessageStore(config, _logger))
                     .Build();
 
                 _logger.LogInformation($"Starting SMTP server on port {port}");
 
-                var smtpServer = new SmtpServer.SmtpServer(options);
+                var smtpServer = new SmtpServer.SmtpServer(options, serviceProvider);
+
                 await smtpServer.StartAsync(stoppingToken);
             }
         }
