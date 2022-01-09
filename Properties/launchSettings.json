@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LupuServ": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
