@@ -1,0 +1,11 @@
+﻿version: "3"
+
+services:
+  lupuserv:
+    build: .
+    container_name: lupuserv-app
+    restart: unless-stopped
+    ports:
+      - 2025:2025
+    volumes:
+      - ./appsettings.json:/app/appsettings.json:ro
