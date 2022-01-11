@@ -33,16 +33,12 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
   - Get the Product token/API key for the Messaging gateway
 - Build and deploy this solution to a system of your choice
   - For example, install Docker CE on a Raspberry Pi 2 and use the provided compose file to permanently run it as a container. There's plenty documentation out there on how to do that so I will not go into details here.
-- Rename `appsettings.example.json` to `appsettings.json`, adjust content according to your environment and restart the service 
+    1) Build: `docker built -t lupuserv:latest .`
+    2) Run: `docker run --name lupuserv -p 2025:2025 -v "${PWD}/appsettings.json:/app/appsettings.json" -d --restart unless-stopped lupuserv:latest`
+- Rename `appsettings.example.json` to `appsettings.json`, adjust content according to your environment and restart the service
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI so it might look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
-
-## Logging
-
-[Microsoft.Extensions.Logging](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging?view=dotnet-plat-ext-3.1) facility is used to log straight to systemd, which can be observed by `journalctl -f -u LupuServ.service --since today`, for example:
-
-![Status](./assets/jtMyF1wvwA.png)
 
 ## Sources & 3rd party credits
 
