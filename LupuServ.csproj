@@ -15,6 +15,7 @@
     <PackageReference Include="SmtpServer" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0" />
+    <PackageReference Include="Tiny.RestClient" Version="1.7.1" />
   </ItemGroup>
 
   <ItemGroup>
