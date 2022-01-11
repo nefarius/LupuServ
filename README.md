@@ -19,7 +19,7 @@ The solution has been developed for and tested with the Lupusec XT1 (**not** Plu
 Some shortcuts have been taken on purpose while developing this proxy application. As of now I have no plans to rectify them or focus on additional features.
 
 - SMTP-Server doesn't use authentication, it accepts any username and password
-  - This solution is meant to be operated in a firewall-protected private network, and without forced TLS protection plaintext authentication is a useless "security" measure anyway. It can be added quite easily though, consult the documentation of the SMP library.
+  - This solution is meant to be operated in a firewall-protected private network, and without forced TLS protection plaintext authentication is a useless "security" measure anyway. It can be added quite easily though, consult the documentation of the SMTP library.
 - SMS gateway failures are logged, but no other notification happens
   - SMS delivery errors can occur, like if the credit of the used account is depleted, this should be delivered to technical personnel via some way.
 - No rate limits or other protection to mitigate SMS-bombing
