@@ -10,7 +10,7 @@ I happened to know an owner of the very early central alarm system Lupusec XT1 f
 
 The system offers a few methods of notifying the outside world about an alarm event, the one in question being able to send a classic SMS message to a maximum of two phone numbers. APIs tend to change or become deprecated, and without firmware updates there isn't much one can do. Which is exactly what happened here; the SMS gateway implementation broke and thanks to this thing not provide any logs or sources, who knows why. This leaves us with a few different channels to grab events from: Contact-ID - which I have no idea what that is and what to do with it - and E-Mail.
 
-I decided to abuse the E-Mail functionality to receive alarm (and status change) events by faking an SMTP-Server, which in turn transforms the mail body and sends it to an SMS gateway in proxy. The application uses .NET 5.0 and is designed as a Worker compatible with Docker, so it should run on any supported Linux system.
+I decided to abuse the E-Mail functionality to receive alarm (and status change) events by faking an SMTP-Server, which in turn transforms the mail body and sends it to an SMS gateway in proxy. The application uses .NET 7.0 and is designed as a Worker compatible with Docker, so it should run on any supported Linux system.
 
 ## Supported Systems
 
