@@ -17,4 +17,4 @@ jobs:
       with:
         fetch-depth: 0
     - name: Build the Docker image
-      run: docker build . --platform linux/arm/v7 --file Dockerfile --tag lupuserv:$(date +%s)
+      run: docker build . --platform linux/amd64 --file Dockerfile --tag lupuserv:$(date +%s)
