@@ -2,10 +2,23 @@
 
 using Microsoft.Extensions.Options;
 
+using Serilog;
+
 using SmtpServer;
 using SmtpServer.Storage;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddLogging(config =>
+{
+    config.ClearProviders();
+
+    Log.Logger = new LoggerConfiguration()
+        .WriteTo.Console(applyThemeToRedirectedOutput: true)
+        .CreateBootstrapLogger();
+
+    config.AddSerilog(Log.Logger);
+});
 
 IConfigurationSection config = builder.Configuration.GetSection("Service");
 
