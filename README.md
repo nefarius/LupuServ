@@ -58,3 +58,4 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
 - [CM Text SDK](https://github.com/cmdotcom/text-sdk-dotnet)
 - [MimeKit](https://github.com/jstedfast/MimeKit)
 - [SmtpServer](https://github.com/cosullivan/SmtpServer)
+- [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
