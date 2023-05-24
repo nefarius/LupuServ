@@ -1,3 +1,5 @@
+<img src="assets/NSS-128x128.png" align="right" />
+
 # LupuServ
 
 E-Mail to SMS Gateway service for Lupusec XT1 alarm system
