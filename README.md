@@ -2,6 +2,8 @@
 
 # LupuServ
 
+[![.NET](https://github.com/nefarius/LupuServ/actions/workflows/dotnet.yml/badge.svg)](https://github.com/nefarius/LupuServ/actions/workflows/dotnet.yml)
+
 E-Mail to SMS Gateway service for Lupusec XT1 alarm system
 
 ## Motivation
