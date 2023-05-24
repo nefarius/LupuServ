@@ -23,7 +23,6 @@ internal class Program
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         return Host.CreateDefaultBuilder(args)
-            .UseSystemd()
             .ConfigureServices((hostContext, services) => { services.AddHostedService<Worker>(); });
     }
 }
