@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace LupuServ.Services;
 
-namespace LupuServ.Services
+internal interface IAlarmReceiver
 {
-    internal interface IAlarmReceiver
-    {
+}
 
-    }
-
-    internal class AlarmReceiver : IAlarmReceiver
-    {
-    }
+internal class AlarmReceiver : IAlarmReceiver
+{
 }

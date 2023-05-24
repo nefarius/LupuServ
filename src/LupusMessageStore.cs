@@ -1,90 +1,102 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using CM.Text;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+
+using MimeKit;
+
 using SmtpServer;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
 
-namespace LupuServ
+namespace LupuServ;
+
+public class LupusMessageStore : MessageStore
 {
-    public class LupusMessageStore : MessageStore
+    private readonly IConfiguration _config;
+
+    private readonly ILogger<Worker> _logger;
+
+    public LupusMessageStore(IConfiguration config, ILogger<Worker> logger)
     {
-        public LupusMessageStore(IConfiguration config, ILogger<Worker> logger)
+        _config = config;
+        _logger = logger;
+    }
+
+    public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction,
+        ReadOnlySequence<byte> buffer,
+        CancellationToken cancellationToken)
+    {
+        string statusUser = _config.GetSection("StatusUser").Value;
+        string alarmUser = _config.GetSection("AlarmUser").Value;
+
+        await using MemoryStream stream = new();
+
+        SequencePosition position = buffer.GetPosition(0);
+        while (buffer.TryGet(ref position, out ReadOnlyMemory<byte> memory))
         {
-            Config = config;
-            Logger = logger;
+            await stream.WriteAsync(memory, cancellationToken);
         }
 
-        public IConfiguration Config { get; }
+        stream.Position = 0;
 
-        public ILogger<Worker> Logger { get; }
+        MimeMessage message = await MimeMessage.LoadAsync(stream, cancellationToken);
 
-        public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, ReadOnlySequence<byte> buffer,
-            CancellationToken cancellationToken)
+        string user = transaction.To.First().User;
+
+        //
+        // Send SMS in alert event only
+        // 
+        if (user.Equals(alarmUser, StringComparison.InvariantCultureIgnoreCase))
         {
-            var statusUser = Config.GetSection("StatusUser").Value;
-            var alarmUser = Config.GetSection("AlarmUser").Value;
-            
-            await using var stream = new MemoryStream();
+            _logger.LogInformation("Received alarm event");
 
-            var position = buffer.GetPosition(0);
-            while (buffer.TryGet(ref position, out var memory))
+            Guid apiKey = Guid.Parse(_config.GetSection("ApiKey").Value);
+
+            string from = _config.GetSection("From").Value;
+
+            List<string> recipients = _config.GetSection("Recipients").GetChildren().Select(e => e.Value).ToList();
+
+            _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
+                string.Join(", ", recipients));
+
+            TextClient client = new(apiKey);
+
+            TextClientResult result = await client
+                .SendMessageAsync(message.TextBody, from, recipients, transaction.From.User, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (result.statusCode == TextClientStatusCode.Ok)
             {
-                await stream.WriteAsync(memory, cancellationToken);
+                _logger.LogInformation("Successfully sent the following message to recipients: {TextBody}",
+                    message.TextBody);
+
+                return SmtpResponse.Ok;
             }
 
-            stream.Position = 0;
+            _logger.LogError("Message delivery failed: {StatusMessage} ({StatusCode})", result.statusMessage,
+                result.statusCode);
 
-            var message = await MimeKit.MimeMessage.LoadAsync(stream, cancellationToken);
-
-            var user = transaction.To.First().User;
-
-            //
-            // Send SMS in alert event only
-            // 
-            if (user.Equals(alarmUser, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Logger.LogInformation("Received alarm event");
-
-                var apiKey = Guid.Parse(Config.GetSection("ApiKey").Value);
-
-                var from = Config.GetSection("From").Value;
-
-                var recipients = Config.GetSection("Recipients").GetChildren().Select(e => e.Value).ToList();
-
-                Logger.LogInformation(
-                    $"Will send alarm SMS to the following recipients: {string.Join(", ", recipients)}");
-
-                var client = new TextClient(apiKey);
-
-                var result = await client
-                    .SendMessageAsync(message.TextBody, from, recipients, transaction.From.User, cancellationToken)
-                    .ConfigureAwait(false);
-
-                if (result.statusCode == TextClientStatusCode.Ok)
-                {
-                    Logger.LogInformation($"Successfully sent the following message to recipients: {message.TextBody}");
-
-                    return SmtpResponse.Ok;
-                }
-
-                Logger.LogError($"Message delivery failed: {result.statusMessage} ({result.statusCode})");
-
-                return SmtpResponse.TransactionFailed;
-            }
-
-            if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
-                Logger.LogInformation($"Received status change: {message.TextBody}");
-            else
-                Logger.LogWarning($"Unknown message received (maybe a test?): {message.TextBody}");
-
-            return SmtpResponse.Ok;
+            return SmtpResponse.TransactionFailed;
         }
+
+        if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
+        {
+            _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
+        }
+        else
+        {
+            _logger.LogWarning("Unknown message received (maybe a test?): {TextBody}", message.TextBody);
+        }
+
+        return SmtpResponse.Ok;
     }
 }
