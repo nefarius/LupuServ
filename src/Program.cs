@@ -1,28 +1,32 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Threading;
+﻿using LupuServ;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
-namespace LupuServ;
+using SmtpServer;
+using SmtpServer.Storage;
 
-internal class Program
-{
-    public static void Main(string[] args)
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+IConfigurationSection config = builder.Configuration.GetSection("Service");
+
+builder.Services.Configure<ServiceConfig>(config);
+
+builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
+
+builder.Services.AddSingleton(
+    provider =>
     {
-        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+        IOptions<ServiceConfig> cfg = provider.GetRequiredService<IOptions<ServiceConfig>>();
 
-        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-        Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+        ISmtpServerOptions? options = new SmtpServerOptionsBuilder()
+            .ServerName("SMTP Server")
+            .Port(cfg.Value.Port)
+            .Build();
 
-        CreateHostBuilder(args).Build().Run();
-    }
+        return new SmtpServer.SmtpServer(options, provider.GetRequiredService<IServiceProvider>());
+    });
 
-    private static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) => { services.AddHostedService<Worker>(); });
-    }
-}
+builder.Services.AddHostedService<Worker>();
+
+IHost host = builder.Build();
+host.Run();

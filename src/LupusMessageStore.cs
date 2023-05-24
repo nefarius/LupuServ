@@ -1,15 +1,8 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Buffers;
 
 using CM.Text;
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using MimeKit;
 
@@ -21,22 +14,21 @@ namespace LupuServ;
 
 public class LupusMessageStore : MessageStore
 {
-    private readonly IConfiguration _config;
+    private readonly ServiceConfig _config;
+    private readonly ILogger<LupusMessageStore> _logger;
 
-    private readonly ILogger<Worker> _logger;
-
-    public LupusMessageStore(IConfiguration config, ILogger<Worker> logger)
+    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config)
     {
-        _config = config;
         _logger = logger;
+        _config = config.Value;
     }
 
     public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction,
         ReadOnlySequence<byte> buffer,
         CancellationToken cancellationToken)
     {
-        string statusUser = _config.GetSection("StatusUser").Value;
-        string alarmUser = _config.GetSection("AlarmUser").Value;
+        string statusUser = _config.StatusUser;
+        string alarmUser = _config.AlarmUser;
 
         await using MemoryStream stream = new();
 
@@ -59,11 +51,11 @@ public class LupusMessageStore : MessageStore
         {
             _logger.LogInformation("Received alarm event");
 
-            Guid apiKey = Guid.Parse(_config.GetSection("ApiKey").Value);
+            Guid apiKey = Guid.Parse(_config.ApiKey);
 
-            string from = _config.GetSection("From").Value;
+            string from = _config.From;
 
-            List<string> recipients = _config.GetSection("Recipients").GetChildren().Select(e => e.Value).ToList();
+            List<string> recipients = _config.Recipients;
 
             _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
                 string.Join(", ", recipients));
