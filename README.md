@@ -27,6 +27,17 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
 - No rate limits or other protection to mitigate SMS-bombing
   - Again, this service should not be hosted outside of a protected network, so it shouldn't be an issue. Bear in mind though, that there is no rate limit so if multiple alarm mails arrive in a short amount of time, it could lead to some unintended message spam.
 
+## How to build
+
+Here's an example using my own tag (adapt accordingly) and [Podman](https://podman.io/) instead of Docker. Since I plan on running the service on a Raspberry Pi 2 Model B Rev 1.1 (ARM32) and build on Windows amd64 we need to specify the correct target platform:
+
+```bash
+podman build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
+podman push nefarius.azurecr.io/lupuserv:latest
+```
+
+Since the Raspberry Pi has limited computing power, I prefer to build the image on my main PC and just download and run it on the Pi.
+
 ## How to set up
 
 - Register an account with [CM.com](https://www.cm.com/)
