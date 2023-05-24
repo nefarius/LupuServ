@@ -10,7 +10,7 @@
     <PackageReference Include="CM.Text" Version="2.6.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="MimeKit" Version="4.0.0" />
     <PackageReference Include="SmtpServer" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
