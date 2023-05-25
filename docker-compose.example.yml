@@ -13,7 +13,48 @@ services:
       - ./appsettings.json:/app/appsettings.json:ro
     ports:
       - 2025:2025
+    networks:
+      - database
+    depends_on: 
+      - lupuserv-db
     logging:
       options:
         max-size: "10m"
         max-file: "3"
+  
+  lupuserv-db:
+    image: mongo:5
+    container_name: lupuserv-db
+    restart: unless-stopped
+    volumes:
+      - ./data/mongo/db:/data/db
+      - ./data/mongo/config:/data/configdb
+    environment:
+      - TZ=Europe/Vienna
+    networks:
+      - database
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  lupuserv-db-ui:
+    image: nefarius.azurecr.io/mongo-express:latest
+    container_name: lupuserv-db-ui
+    restart: unless-stopped
+    depends_on:
+      - lupuserv-db
+    environment:
+      - TZ=Europe/Vienna
+      - ME_CONFIG_MONGODB_URL=mongodb://lupuserv-db:27017/
+      - ME_CONFIG_SITE_COOKIESECRET=1234
+      - ME_CONFIG_SITE_SESSIONSECRET=1234
+    networks:
+      - database
+    ports:
+      - 8081:8081
+    logging:
+      driver: "none"
+      
+networks:
+  database:

@@ -34,4 +34,9 @@ public class ServiceConfig
     ///     One or more phone numbers to relay messages to.
     /// </summary>
     public List<string> Recipients { get; set; } = new();
+
+    /// <summary>
+    ///     Database name.
+    /// </summary>
+    public string DatabaseName { get; set; } = "lupuserv-events";
 }
