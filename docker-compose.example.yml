@@ -1,11 +1,19 @@
-﻿version: "3"
+﻿version: "2.4"
 
 services:
-  lupuserv:
+  lupuserv-app:
+    #image: nefarius.azurecr.io/lupuserv:latest
     build: .
     container_name: lupuserv-app
     restart: unless-stopped
-    ports:
-      - 2025:2025
+    environment:
+      - TZ=Europe/Vienna
+      - Service__ApiKey=<your API key here>
     volumes:
       - ./appsettings.json:/app/appsettings.json:ro
+    ports:
+      - 2025:2025
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
