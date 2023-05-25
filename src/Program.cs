@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 using SmtpServer;
 using SmtpServer.Protocol;
@@ -17,7 +18,7 @@ builder.Services.AddLogging(config =>
     config.ClearProviders();
 
     Log.Logger = new LoggerConfiguration()
-        .WriteTo.Console(applyThemeToRedirectedOutput: true)
+        .WriteTo.Console(applyThemeToRedirectedOutput: true, theme: AnsiConsoleTheme.Literate)
         .CreateBootstrapLogger();
 
     config.AddSerilog(Log.Logger);
