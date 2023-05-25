@@ -26,8 +26,8 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
   - This solution is meant to be operated in a firewall-protected private network, and without forced TLS protection plaintext authentication is a useless "security" measure anyway. It can be added quite easily though, consult the documentation of the SMTP library.
 - SMS gateway failures are logged, but no other notification happens
   - SMS delivery errors can occur, like if the credit of the used account is depleted, this should be delivered to technical personnel via some way.
-- No rate limits or other protection to mitigate SMS-bombing
-  - Again, this service should not be hosted outside of a protected network, so it shouldn't be an issue. Bear in mind though, that there is no rate limit so if multiple alarm mails arrive in a short amount of time, it could lead to some unintended message spam.
+- Basic rate limits to mitigate SMS-bombing
+  - There's a rate limit in place for alarm mails to protect against unintended message spam. A shortcoming of the current implementation is that once the rate limit is hit, the message is dropped and not re-sent.
 
 ## How to build
 
@@ -61,3 +61,4 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
 - [MimeKit](https://github.com/jstedfast/MimeKit)
 - [SmtpServer](https://github.com/cosullivan/SmtpServer)
 - [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
+- [Polly](https://github.com/App-vNext/Polly#rate-limit)

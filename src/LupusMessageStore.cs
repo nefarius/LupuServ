@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 
 using MimeKit;
 
+using Polly.RateLimit;
+
 using SmtpServer;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
@@ -16,10 +18,12 @@ public class LupusMessageStore : MessageStore
 {
     private readonly ServiceConfig _config;
     private readonly ILogger<LupusMessageStore> _logger;
+    private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
-    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config)
+    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config, AsyncRateLimitPolicy<SmtpResponse> rateLimit)
     {
         _logger = logger;
+        _rateLimit = rateLimit;
         _config = config.Value;
     }
 
@@ -57,27 +61,45 @@ public class LupusMessageStore : MessageStore
 
             List<string> recipients = _config.Recipients;
 
-            _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
-                string.Join(", ", recipients));
-
-            TextClient client = new(apiKey);
-
-            TextClientResult result = await client
-                .SendMessageAsync(message.TextBody, from, recipients, transaction.From.User, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (result.statusCode == TextClientStatusCode.Ok)
+            try
             {
-                _logger.LogInformation("Successfully sent the following message to recipients: {TextBody}",
-                    message.TextBody);
+                var response = await _rateLimit.ExecuteAsync(async () =>
+                {
+                    _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
+                        string.Join(", ", recipients));
 
-                return SmtpResponse.Ok;
+                    TextClient client = new(apiKey);
+
+                    TextClientResult result = await client
+                        .SendMessageAsync(message.TextBody, from, recipients, transaction.From.User, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    if (result.statusCode == TextClientStatusCode.Ok)
+                    {
+                        _logger.LogInformation("Successfully sent the following message to recipients: {TextBody}",
+                            message.TextBody);
+
+                        return SmtpResponse.Ok;
+                    }
+
+                    _logger.LogError("Message delivery failed: {StatusMessage} ({StatusCode})", result.statusMessage,
+                        result.statusCode);
+
+                    return SmtpResponse.TransactionFailed;
+                });
+
+                _logger.LogDebug("Text client send result: {@Result}", response);
+                
+                return response;
             }
-
-            _logger.LogError("Message delivery failed: {StatusMessage} ({StatusCode})", result.statusMessage,
-                result.statusCode);
-
-            return SmtpResponse.TransactionFailed;
+            catch (RateLimitRejectedException ex)
+            {
+                _logger.LogError(ex, "Rate limit hit, message not sent");
+                
+                // TODO: implement retry strategy?
+                
+                return SmtpResponse.TransactionFailed;
+            }
         }
 
         if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
