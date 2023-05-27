@@ -1,6 +1,7 @@
 ﻿version: "2.4"
 
 services:
+  # main service
   lupuserv-app:
     #image: nefarius.azurecr.io/lupuserv:latest
     build: .
@@ -16,45 +17,45 @@ services:
     networks:
       - database
     depends_on: 
-      - lupuserv-db
+      - lupuserv-ferretdb
     logging:
       options:
         max-size: "10m"
         max-file: "3"
   
-  lupuserv-db:
-    image: mongo:5
-    container_name: lupuserv-db
+  # Postgres
+  lupuserv-postgres:
+    image: postgres
+    container_name: lupuserv-postgres
     restart: unless-stopped
-    volumes:
-      - ./data/mongo/db:/data/db
-      - ./data/mongo/config:/data/configdb
     environment:
-      - TZ=Europe/Vienna
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=lupuserv-events
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
     networks:
       - database
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-
-  lupuserv-db-ui:
-    image: nefarius.azurecr.io/mongo-express:latest
-    container_name: lupuserv-db-ui
+  
+  # MongoDB compatibility wrapper
+  lupuserv-ferretdb:
+    image: ghcr.io/ferretdb/ferretdb
+    container_name: lupuserv-ferretdb
     restart: unless-stopped
-    depends_on:
-      - lupuserv-db
     environment:
-      - TZ=Europe/Vienna
-      - ME_CONFIG_MONGODB_URL=mongodb://lupuserv-db:27017/
-      - ME_CONFIG_SITE_COOKIESECRET=1234
-      - ME_CONFIG_SITE_SESSIONSECRET=1234
+      - FERRETDB_POSTGRESQL_URL=postgres://username:password@lupuserv-postgres:5432/lupuserv-events
     networks:
       - database
-    ports:
-      - 8081:8081
+    depends_on: 
+      - lupuserv-postgres
     logging:
-      driver: "none"
+      options:
+        max-size: "10m"
+        max-file: "3"
       
 networks:
   database:

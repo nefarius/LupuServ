@@ -59,9 +59,13 @@ if (string.IsNullOrEmpty(connectionString) || serviceConfig is null)
     throw new ArgumentException("Configuration incomplete!");
 }
 
+Log.Logger.Information("Connecting to database");
+
 DB.InitAsync(serviceConfig.DatabaseName, MongoClientSettings.FromConnectionString(connectionString))
     .GetAwaiter()
     .GetResult();
+
+Log.Logger.Information("Database connected");
 
 IHost host = builder.Build();
 host.Run();
