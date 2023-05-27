@@ -2,9 +2,13 @@
 
 using CM.Text;
 
+using LupuServ.Models;
+
 using Microsoft.Extensions.Options;
 
 using MimeKit;
+
+using MongoDB.Entities;
 
 using Polly.RateLimit;
 
@@ -20,7 +24,8 @@ public class LupusMessageStore : MessageStore
     private readonly ILogger<LupusMessageStore> _logger;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
-    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config, AsyncRateLimitPolicy<SmtpResponse> rateLimit)
+    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config,
+        AsyncRateLimitPolicy<SmtpResponse> rateLimit)
     {
         _logger = logger;
         _rateLimit = rateLimit;
@@ -63,7 +68,7 @@ public class LupusMessageStore : MessageStore
 
             try
             {
-                var response = await _rateLimit.ExecuteAsync(async () =>
+                SmtpResponse? response = await _rateLimit.ExecuteAsync(async () =>
                 {
                     _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
                         string.Join(", ", recipients));
@@ -89,15 +94,15 @@ public class LupusMessageStore : MessageStore
                 });
 
                 _logger.LogDebug("Text client send result: {@Result}", response);
-                
+
                 return response;
             }
             catch (RateLimitRejectedException ex)
             {
                 _logger.LogError(ex, "Rate limit hit, message not sent");
-                
+
                 // TODO: implement retry strategy?
-                
+
                 return SmtpResponse.TransactionFailed;
             }
         }
@@ -105,6 +110,16 @@ public class LupusMessageStore : MessageStore
         if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
+
+            if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent))
+            {
+                await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
+                _logger.LogDebug("Status event inserted into DB");
+            }
+            else
+            {
+                _logger.LogWarning("Failed to parse {TextBody} into object", message.TextBody);
+            }
         }
         else
         {
