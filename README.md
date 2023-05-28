@@ -54,6 +54,8 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI so it might look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
+- **Optional:** to get Arm/Home/Disarm events sent as status messages you need to explicitly enable them in the PIN Codes settings:  
+  ![PIN-Codes](./assets/D4JOzRXITd.png) 
 
 ## Sources & 3rd party credits
 
