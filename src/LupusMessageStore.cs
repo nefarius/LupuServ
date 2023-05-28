@@ -15,6 +15,7 @@ using Polly.RateLimit;
 using SmtpServer;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
+// ReSharper disable InvertIf
 
 namespace LupuServ;
 
@@ -53,9 +54,7 @@ public class LupusMessageStore : MessageStore
 
         string user = transaction.To.First().User;
 
-        //
-        // Send SMS in alert event only
-        // 
+        // matches alarm message
         if (user.Equals(alarmUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received alarm event");
@@ -107,18 +106,23 @@ public class LupusMessageStore : MessageStore
             }
         }
 
+        // matches status message
         if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
 
-            if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent))
+            if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent) &&
+                zoneMobilityEvent is not null)
             {
                 await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogDebug("Status event inserted into DB");
+                _logger.LogDebug("Zone status event inserted into DB");
             }
-            else
+
+            if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
+                perimeterEvent is not null)
             {
-                _logger.LogWarning("Failed to parse {TextBody} into object", message.TextBody);
+                await perimeterEvent.SaveAsync(cancellation: cancellationToken);
+                _logger.LogDebug("Perimeter status event inserted into DB");
             }
         }
         else
