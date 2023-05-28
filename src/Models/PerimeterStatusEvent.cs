@@ -7,6 +7,7 @@ using MongoDB.Entities;
 
 namespace LupuServ.Models;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public sealed class PerimeterStatusEventType : SmartEnum<PerimeterStatusEventType>
 {
     public static readonly PerimeterStatusEventType Arm = new("Arm", 1);
@@ -39,7 +40,7 @@ public sealed partial class PerimeterStatusEvent : Entity
     /// </summary>
     public PerimeterStatusEventType EventType { get; private set; } = null!;
 
-    [GeneratedRegex(@"^([a-zA-Z0-9 _.-]*), ([Arm|Home|Disarm]*)$")]
+    [GeneratedRegex(@"^([a-zA-Z\u00F0-\u02AF0-9 _.-]*), ([Arm|Home|Disarm]*)$")]
     private static partial Regex PerimeterStatusRegex();
 
     public static bool TryParse(string message, out PerimeterStatusEvent? parsedEvent)

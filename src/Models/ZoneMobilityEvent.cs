@@ -7,6 +7,7 @@ using MongoDB.Entities;
 
 namespace LupuServ.Models;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public sealed class ZoneMobilityEventType : SmartEnum<ZoneMobilityEventType>
 {
     public static readonly ZoneMobilityEventType DoorContactOpen = new("DC Open", 1);
@@ -44,7 +45,7 @@ public sealed partial class ZoneMobilityEvent : Entity
     /// </summary>
     public ZoneMobilityEventType EventType { get; private set; } = null!;
 
-    [GeneratedRegex(@"^Zone:(\d*) ([a-zA-Z0-9 _.-]*), ([a-zA-Z0-9 _.-]*) - Mobility$")]
+    [GeneratedRegex(@"^Zone:(\d*) ([a-zA-Z\u00F0-\u02AF0-9 _.-]*), ([a-zA-Z0-9 _.-]*) - Mobility$")]
     private static partial Regex ZoneMobilityRegex();
 
     public static bool TryParse(string message, out ZoneMobilityEvent? parsedEvent)

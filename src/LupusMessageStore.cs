@@ -59,6 +59,20 @@ public class LupusMessageStore : MessageStore
         {
             _logger.LogInformation("Received alarm event");
 
+            try
+            {
+                if (AlarmEvent.TryParse(message.TextBody, out AlarmEvent? alarmEvent) &&
+                    alarmEvent is not null)
+                {
+                    await alarmEvent.SaveAsync(cancellation: cancellationToken);
+                    _logger.LogDebug("Alarm event inserted into DB");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to parse alarm event");
+            }
+
             Guid apiKey = Guid.Parse(_config.ApiKey);
 
             string from = _config.From;
