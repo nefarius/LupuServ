@@ -1,23 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-using Ardalis.SmartEnum;
-
 using MongoDB.Entities;
 
 namespace LupuServ.Models;
-
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
-public sealed class PerimeterStatusEventType : SmartEnum<PerimeterStatusEventType>
-{
-    public static readonly PerimeterStatusEventType Arm = new("Arm", 1);
-    public static readonly PerimeterStatusEventType Home = new("Home", 2);
-    public static readonly PerimeterStatusEventType Disarm = new("Disarm", 3);
-
-    private PerimeterStatusEventType(string name, int value) : base(name, value)
-    {
-    }
-}
 
 /// <summary>
 ///     Represents a perimeter status event.

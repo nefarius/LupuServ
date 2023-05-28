@@ -1,23 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-using Ardalis.SmartEnum;
-
 using MongoDB.Entities;
 
 namespace LupuServ.Models;
-
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
-public sealed class ZoneMobilityEventType : SmartEnum<ZoneMobilityEventType>
-{
-    public static readonly ZoneMobilityEventType DoorContactOpen = new("DC Open", 1);
-    public static readonly ZoneMobilityEventType DoorContactClose = new("DC Close", 2);
-    public static readonly ZoneMobilityEventType InfraRedActivity = new("IR Activity", 3);
-
-    private ZoneMobilityEventType(string name, int value) : base(name, value)
-    {
-    }
-}
 
 /// <summary>
 ///     Represents a zone (sensor change) status event.
