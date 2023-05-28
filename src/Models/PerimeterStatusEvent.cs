@@ -39,7 +39,7 @@ public sealed partial class PerimeterStatusEvent : Entity
     /// </summary>
     public PerimeterStatusEventType EventType { get; private set; } = null!;
 
-    [GeneratedRegex(@"^([a-zA-Z0-9 _.-]*), ([Arm|Disarm]*)$")]
+    [GeneratedRegex(@"^([a-zA-Z0-9 _.-]*), ([Arm|Home|Disarm]*)$")]
     private static partial Regex PerimeterStatusRegex();
 
     public static bool TryParse(string message, out PerimeterStatusEvent? parsedEvent)
