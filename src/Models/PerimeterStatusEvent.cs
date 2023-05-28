@@ -54,7 +54,7 @@ public sealed partial class PerimeterStatusEvent : Entity
 
         string userName = match.Groups[1].Value;
 
-        if (!PerimeterStatusEventType.TryFromName(match.Groups[3].Value, out PerimeterStatusEventType? eventType))
+        if (!PerimeterStatusEventType.TryFromName(match.Groups[2].Value, out PerimeterStatusEventType? eventType))
         {
             parsedEvent = null;
             return false;
