@@ -62,3 +62,6 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
 - [SmtpServer](https://github.com/cosullivan/SmtpServer)
 - [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
 - [Polly](https://github.com/App-vNext/Polly#rate-limit)
+- [LUPUSEC XT1 Handbuch](https://archive.org/details/manualzilla-id-6737868/)
+- [MongoDB.Entities](https://mongodb-entities.com/)
+- [FerretDB](https://www.ferretdb.io/)
