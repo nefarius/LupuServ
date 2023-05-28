@@ -2,15 +2,20 @@
 
 using CM.Text;
 
+using LupuServ.Models;
+
 using Microsoft.Extensions.Options;
 
 using MimeKit;
+
+using MongoDB.Entities;
 
 using Polly.RateLimit;
 
 using SmtpServer;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
+// ReSharper disable InvertIf
 
 namespace LupuServ;
 
@@ -20,7 +25,8 @@ public class LupusMessageStore : MessageStore
     private readonly ILogger<LupusMessageStore> _logger;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
-    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config, AsyncRateLimitPolicy<SmtpResponse> rateLimit)
+    public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config,
+        AsyncRateLimitPolicy<SmtpResponse> rateLimit)
     {
         _logger = logger;
         _rateLimit = rateLimit;
@@ -48,12 +54,24 @@ public class LupusMessageStore : MessageStore
 
         string user = transaction.To.First().User;
 
-        //
-        // Send SMS in alert event only
-        // 
+        // matches alarm message
         if (user.Equals(alarmUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received alarm event");
+
+            try
+            {
+                if (AlarmEvent.TryParse(message.TextBody, out AlarmEvent? alarmEvent) &&
+                    alarmEvent is not null)
+                {
+                    await alarmEvent.SaveAsync(cancellation: cancellationToken);
+                    _logger.LogDebug("Alarm event inserted into DB");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to parse alarm event");
+            }
 
             Guid apiKey = Guid.Parse(_config.ApiKey);
 
@@ -63,7 +81,7 @@ public class LupusMessageStore : MessageStore
 
             try
             {
-                var response = await _rateLimit.ExecuteAsync(async () =>
+                SmtpResponse? response = await _rateLimit.ExecuteAsync(async () =>
                 {
                     _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
                         string.Join(", ", recipients));
@@ -89,22 +107,37 @@ public class LupusMessageStore : MessageStore
                 });
 
                 _logger.LogDebug("Text client send result: {@Result}", response);
-                
+
                 return response;
             }
             catch (RateLimitRejectedException ex)
             {
                 _logger.LogError(ex, "Rate limit hit, message not sent");
-                
+
                 // TODO: implement retry strategy?
-                
+
                 return SmtpResponse.TransactionFailed;
             }
         }
 
+        // matches status message
         if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
+
+            if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent) &&
+                zoneMobilityEvent is not null)
+            {
+                await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
+                _logger.LogDebug("Zone status event inserted into DB");
+            }
+
+            if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
+                perimeterEvent is not null)
+            {
+                await perimeterEvent.SaveAsync(cancellation: cancellationToken);
+                _logger.LogDebug("Perimeter status event inserted into DB");
+            }
         }
         else
         {

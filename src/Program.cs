@@ -2,6 +2,9 @@
 
 using Microsoft.Extensions.Options;
 
+using MongoDB.Driver;
+using MongoDB.Entities;
+
 using Polly;
 
 using Serilog;
@@ -47,6 +50,22 @@ builder.Services.AddSingleton(
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
 
 builder.Services.AddHostedService<Worker>();
+
+string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
+ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
+
+if (string.IsNullOrEmpty(connectionString) || serviceConfig is null)
+{
+    throw new ArgumentException("Configuration incomplete!");
+}
+
+Log.Logger.Information("Connecting to database");
+
+DB.InitAsync(serviceConfig.DatabaseName, MongoClientSettings.FromConnectionString(connectionString))
+    .GetAwaiter()
+    .GetResult();
+
+Log.Logger.Information("Database connected");
 
 IHost host = builder.Build();
 host.Run();

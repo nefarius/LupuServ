@@ -48,17 +48,27 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
   - Get the Product token/API key for the Messaging gateway
 - Build and deploy this solution to a system of your choice
   - For example, install Docker CE on a Raspberry Pi 2 and use the provided compose file to permanently run it as a container. There's plenty documentation out there on how to do that so I will not go into details here.
-    1) Build: `docker built -t lupuserv:latest .`
-    2) Run: `docker run --name lupuserv -p 2025:2025 -v "${PWD}/appsettings.json:/app/appsettings.json" -d --restart unless-stopped lupuserv:latest`
-- Rename `appsettings.example.json` to `appsettings.json`, adjust content according to your environment and restart the service
+    1) Rename `docker-compose.example.yml` to `docker-compose.yml` and adjust its content accordingly
+    2) Rename `appsettings.example.json` to `appsettings.json` and adjust content according to your environment
+    3) Run: `docker-compose up -d`
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI so it might look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
+- **Optional:** to get Arm/Home/Disarm events sent as status messages you need to explicitly enable them in the PIN Codes settings:  
+  ![PIN-Codes](./assets/D4JOzRXITd.png) 
 
 ## Sources & 3rd party credits
+
+This application benefits from these awesome projects ❤ (appearance in no special order):
 
 - [CM Text SDK](https://github.com/cmdotcom/text-sdk-dotnet)
 - [MimeKit](https://github.com/jstedfast/MimeKit)
 - [SmtpServer](https://github.com/cosullivan/SmtpServer)
-- [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
 - [Polly](https://github.com/App-vNext/Polly#rate-limit)
+- [MongoDB.Entities](https://mongodb-entities.com/)
+- [FerretDB](https://www.ferretdb.io/)
+
+### References
+
+- [LUPUSEC XT1 Handbuch](https://archive.org/details/manualzilla-id-6737868/)
+- [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
