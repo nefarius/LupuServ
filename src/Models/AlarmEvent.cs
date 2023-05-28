@@ -41,7 +41,7 @@ public sealed partial class AlarmEvent : Entity
     public DateTime CreatedAt { get; private set; }
 
     /// <summary>
-    ///     Gets the Zone ID (Sensor number).
+    ///     Gets the Zone ID (Sensor number). Not every message includes a zone identifier.
     /// </summary>
     public int? ZoneId { get; private set; }
 
