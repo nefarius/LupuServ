@@ -22,36 +22,19 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-  
-  # Postgres
-  lupuserv-postgres:
-    image: postgres
-    container_name: lupuserv-postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=username
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=lupuserv-events
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    networks:
-      - database
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-  
+
   # MongoDB compatibility wrapper
   lupuserv-ferretdb:
-    image: ghcr.io/ferretdb/ferretdb
+    image: ghcr.io/ferretdb/ferretdb:1.11.0
     container_name: lupuserv-ferretdb
     restart: unless-stopped
+    volumes:
+      - ./data/sqlite:/data
     environment:
-      - FERRETDB_POSTGRESQL_URL=postgres://username:password@lupuserv-postgres:5432/lupuserv-events
+      - FERRETDB_HANDLER=sqlite
+      - FERRETDB_SQLITE_URL=file:/data/
     networks:
       - database
-    depends_on: 
-      - lupuserv-postgres
     logging:
       options:
         max-size: "10m"
