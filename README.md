@@ -18,6 +18,13 @@ I decided to abuse the E-Mail functionality to receive alarm (and status change)
 
 The solution has been developed for and tested with the Lupusec XT1 (**not** Plus!) central station running Firmware version **1.0.89** and LupuServ hosted on a Raspberry Pi 2 Model B Rev 1.1 (ARM32). The only SMS gateway provider implemented is [CM.com](https://www.cm.com/about-cm/) so you need a registered account and a minimum balance required for the Messaging gateway channel.
 
+## Features
+
+- Can send messages to more than two recipients (limit of original firmware)
+- Stores status changes and alarm events in any MongoDB-compatible database
+  - The example compose file uses [FerretDB](https://github.com/FerretDB/FerretDB) with the [SQLite](https://www.sqlite.org/index.html) backend
+  - This way you can automatically keep a log e.g. off-site on what's going on in the monitored premises
+
 ## Limitations
 
 Some shortcuts have been taken on purpose while developing this proxy application. As of now I have no plans to rectify them or focus on additional features.
