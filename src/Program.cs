@@ -1,6 +1,7 @@
 ﻿using LupuServ;
 using LupuServ.Services;
 using LupuServ.Services.Gateways;
+using LupuServ.Services.Web;
 
 using Microsoft.Extensions.Options;
 
@@ -8,6 +9,8 @@ using MongoDB.Driver;
 using MongoDB.Entities;
 
 using Polly;
+
+using Refit;
 
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -33,10 +36,17 @@ IConfigurationSection config = builder.Configuration.GetSection("Service");
 
 builder.Services.Configure<ServiceConfig>(config);
 
-builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
-
+// Gateways
 builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
 
+// Refit
+builder.Services.AddTransient<AuthHeaderHandler>();
+builder.Services.AddRefitClient<IClickSendApi>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://rest.clicksend.com/"))
+    .AddHttpMessageHandler<AuthHeaderHandler>();
+
+// SMTP
+builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
 builder.Services.AddSingleton(
     provider =>
     {
