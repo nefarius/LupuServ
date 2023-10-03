@@ -1,4 +1,6 @@
 ﻿using LupuServ;
+using LupuServ.Services;
+using LupuServ.Services.Gateways;
 
 using Microsoft.Extensions.Options;
 
@@ -32,6 +34,8 @@ IConfigurationSection config = builder.Configuration.GetSection("Service");
 builder.Services.Configure<ServiceConfig>(config);
 
 builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
+
+builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
 
 builder.Services.AddSingleton(
     provider =>
