@@ -34,4 +34,8 @@
     <None Remove="Properties\launchSettings.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
+
 </Project>
