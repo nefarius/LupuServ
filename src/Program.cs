@@ -21,6 +21,7 @@ using SmtpServer.Storage;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
+// Logging
 builder.Services.AddLogging(config =>
 {
     config.ClearProviders();
@@ -32,8 +33,8 @@ builder.Services.AddLogging(config =>
     config.AddSerilog(Log.Logger);
 });
 
+// Config
 IConfigurationSection config = builder.Configuration.GetSection("Service");
-
 builder.Services.Configure<ServiceConfig>(config);
 
 // Gateways
@@ -63,8 +64,10 @@ builder.Services.AddSingleton(
 // Singleton because there is one sender API to protect across multiple incoming messages
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
 
+// Spins up SMTP server instance
 builder.Services.AddHostedService<Worker>();
 
+// Database
 string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
 ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
 
