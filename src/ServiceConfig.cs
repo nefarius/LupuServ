@@ -9,7 +9,7 @@ public sealed class CMConfig
     /// <summary>
     ///     The <see href="https://www.cm.com/" /> API key.
     /// </summary>
-    public string ApiKey { get; set; } = null!;
+    public Guid ApiKey { get; set; }
 }
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
@@ -30,9 +30,6 @@ public sealed class ServiceConfig
     ///     The port the SMTP server will listen on.
     /// </summary>
     public int Port { get; set; } = 2025;
-    
-    [Obsolete("Use CM.ApiKey instead")]
-    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     ///     CM gateway details.

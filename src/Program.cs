@@ -38,7 +38,8 @@ IConfigurationSection config = builder.Configuration.GetSection("Service");
 builder.Services.Configure<ServiceConfig>(config);
 
 // Gateways
-builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
+//builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
+builder.Services.AddTransient<IMessageGateway, ClickSendGateway>();
 
 // Refit
 builder.Services.AddTransient<AuthHeaderHandler>();

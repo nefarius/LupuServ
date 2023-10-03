@@ -43,7 +43,7 @@ public sealed class SmsResponseCurrency
 public sealed class SmsResponseData
 {
     [JsonPropertyName("total_price")]
-    public double TotalPrice { get; set; }
+    public decimal TotalPrice { get; set; }
 
     [JsonPropertyName("total_count")]
     public int TotalCount { get; set; }
@@ -86,7 +86,7 @@ public sealed class SmsResponseMessage
     public int MessageParts { get; set; }
 
     [JsonPropertyName("message_price")]
-    public double MessagePrice { get; set; }
+    public string MessagePrice { get; set; }
 
     [JsonPropertyName("custom_string")]
     public string CustomString { get; set; }

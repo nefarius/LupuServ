@@ -10,7 +10,7 @@ namespace LupuServ.Services.Gateways;
 ///     Sends SMS via https://www.cm.com/
 /// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public class CMMessageGateway : IMessageGateway
+public sealed class CMMessageGateway : IMessageGateway
 {
     private readonly ILogger<CMMessageGateway> _logger;
     private readonly TextClient _textClient;
@@ -19,9 +19,7 @@ public class CMMessageGateway : IMessageGateway
     {
         _logger = logger;
 
-        ServiceConfig config1 = config.Value;
-        Guid apiKey = Guid.Parse(config1.ApiKey);
-        _textClient = new TextClient(apiKey);
+        _textClient = new TextClient(config.Value.CM!.ApiKey);
     }
 
     public async Task<bool> SendMessage(string body, string from, IEnumerable<string> recipients,
