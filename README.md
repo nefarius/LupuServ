@@ -74,6 +74,7 @@ This application benefits from these awesome projects ❤ (appearance in no spec
 - [Polly](https://github.com/App-vNext/Polly#rate-limit)
 - [MongoDB.Entities](https://mongodb-entities.com/)
 - [FerretDB](https://www.ferretdb.io/)
+- [Refit](https://github.com/reactiveui/refit)
 
 ### References
 
