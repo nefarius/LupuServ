@@ -1,8 +1,7 @@
 ﻿using System.Buffers;
 
-using CM.Text;
-
 using LupuServ.Models;
+using LupuServ.Services;
 
 using Microsoft.Extensions.Options;
 
@@ -15,6 +14,7 @@ using Polly.RateLimit;
 using SmtpServer;
 using SmtpServer.Protocol;
 using SmtpServer.Storage;
+
 // ReSharper disable InvertIf
 
 namespace LupuServ;
@@ -23,13 +23,15 @@ public class LupusMessageStore : MessageStore
 {
     private readonly ServiceConfig _config;
     private readonly ILogger<LupusMessageStore> _logger;
+    private readonly IMessageGateway _messageGateway;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
     public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config,
-        AsyncRateLimitPolicy<SmtpResponse> rateLimit)
+        AsyncRateLimitPolicy<SmtpResponse> rateLimit, IMessageGateway messageGateway)
     {
         _logger = logger;
         _rateLimit = rateLimit;
+        _messageGateway = messageGateway;
         _config = config.Value;
     }
 
@@ -72,11 +74,8 @@ public class LupusMessageStore : MessageStore
             {
                 _logger.LogError(ex, "Failed to parse alarm event");
             }
-
-            Guid apiKey = Guid.Parse(_config.ApiKey);
-
+            
             string from = _config.From;
-
             List<string> recipients = _config.Recipients;
 
             try
@@ -86,24 +85,10 @@ public class LupusMessageStore : MessageStore
                     _logger.LogInformation("Will send alarm SMS to the following recipients: {Recipients}",
                         string.Join(", ", recipients));
 
-                    TextClient client = new(apiKey);
+                    bool result =
+                        await _messageGateway.SendMessage(message.TextBody, from, recipients, cancellationToken);
 
-                    TextClientResult result = await client
-                        .SendMessageAsync(message.TextBody, from, recipients, transaction.From.User, cancellationToken)
-                        .ConfigureAwait(false);
-
-                    if (result.statusCode == TextClientStatusCode.Ok)
-                    {
-                        _logger.LogInformation("Successfully sent the following message to recipients: {TextBody}",
-                            message.TextBody);
-
-                        return SmtpResponse.Ok;
-                    }
-
-                    _logger.LogError("Message delivery failed: {StatusMessage} ({StatusCode})", result.statusMessage,
-                        result.statusCode);
-
-                    return SmtpResponse.TransactionFailed;
+                    return result ? SmtpResponse.Ok : SmtpResponse.TransactionFailed;
                 });
 
                 _logger.LogDebug("Text client send result: {@Result}", response);

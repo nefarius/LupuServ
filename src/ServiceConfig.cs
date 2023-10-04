@@ -1,19 +1,57 @@
-﻿namespace LupuServ;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace LupuServ;
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+public sealed class CMConfig
+{
+    /// <summary>
+    ///     The <see href="https://www.cm.com/" /> API key.
+    /// </summary>
+    public Guid ApiKey { get; set; }
+}
+
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+public sealed class ClickSendConfig
+{
+    public string? Username { get; set; }
+
+    public string? Token { get; set; }
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum GatewayService
+{
+    CM,
+    ClickSend
+}
 
 /// <summary>
 ///     The dynamic service configuration.
 /// </summary>
-public class ServiceConfig
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public sealed class ServiceConfig
 {
     /// <summary>
     ///     The port the SMTP server will listen on.
     /// </summary>
     public int Port { get; set; } = 2025;
-    
+
     /// <summary>
-    ///     The <see href="https://www.cm.com/" /> API key.
+    ///     The preferred message sending gateway to use.
     /// </summary>
-    public string ApiKey { get; set; } = null!;
+    public GatewayService Gateway { get; set; } = GatewayService.ClickSend;
+
+    /// <summary>
+    ///     CM gateway details.
+    /// </summary>
+    public CMConfig? CM { get; set; }
+
+    /// <summary>
+    ///     ClickSend gateway details.
+    /// </summary>
+    public ClickSendConfig ClickSend { get; set; } = new();
 
     /// <summary>
     ///     The user part of the sender address sending status messages.

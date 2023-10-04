@@ -1,4 +1,7 @@
 ﻿using LupuServ;
+using LupuServ.Services;
+using LupuServ.Services.Gateways;
+using LupuServ.Services.Web;
 
 using Microsoft.Extensions.Options;
 
@@ -6,6 +9,8 @@ using MongoDB.Driver;
 using MongoDB.Entities;
 
 using Polly;
+
+using Refit;
 
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -16,6 +21,7 @@ using SmtpServer.Storage;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
+// Logging
 builder.Services.AddLogging(config =>
 {
     config.ClearProviders();
@@ -27,12 +33,38 @@ builder.Services.AddLogging(config =>
     config.AddSerilog(Log.Logger);
 });
 
+// Config
 IConfigurationSection config = builder.Configuration.GetSection("Service");
+ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
+
+if (serviceConfig is null)
+{
+    throw new ArgumentException("Configuration incomplete!");
+}
 
 builder.Services.Configure<ServiceConfig>(config);
 
-builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
+// Gateways
+switch (serviceConfig.Gateway)
+{
+    case GatewayService.CM:
+        builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
+        break;
+    case GatewayService.ClickSend:
+        builder.Services.AddTransient<IMessageGateway, ClickSendGateway>();
+        break;
+    default:
+        throw new ArgumentOutOfRangeException(nameof(serviceConfig.Gateway), "Unknown gateway service");
+}
 
+// Refit
+builder.Services.AddTransient<AuthHeaderHandler>();
+builder.Services.AddRefitClient<IClickSendApi>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://rest.clicksend.com/"))
+    .AddHttpMessageHandler<AuthHeaderHandler>();
+
+// SMTP
+builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
 builder.Services.AddSingleton(
     provider =>
     {
@@ -49,12 +81,13 @@ builder.Services.AddSingleton(
 // Singleton because there is one sender API to protect across multiple incoming messages
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
 
+// Spins up SMTP server instance
 builder.Services.AddHostedService<Worker>();
 
+// Database
 string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
-ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
 
-if (string.IsNullOrEmpty(connectionString) || serviceConfig is null)
+if (string.IsNullOrEmpty(connectionString))
 {
     throw new ArgumentException("Configuration incomplete!");
 }
