@@ -16,7 +16,7 @@ I decided to abuse the E-Mail functionality to receive alarm (and status change)
 
 ## Supported Systems
 
-The solution has been developed for and tested with the Lupusec XT1 (**not** Plus!) central station running Firmware version **1.0.89** and LupuServ hosted on a Raspberry Pi 2 Model B Rev 1.1 (ARM32). Currently two SMS gateway providers are implemented: [CM.com](https://www.cm.com/about-cm/) and [ClickSend](https://www.clicksend.com/eu/) so you need a registered account and a minimum balance for any of those.
+The solution has been developed for and tested with the Lupusec XT1 (**not** Plus!) central station running Firmware version **1.0.89** and LupuServ hosted on a Raspberry Pi 2 Model B Rev 1.1 (ARM32). Currently two SMS gateway providers are implemented: [CM.com](https://www.cm.com/about-cm/) and [ClickSend](https://www.clicksend.com/eu/) so you need a registered account and top up a minimum balance for either of those.
 
 ## Features
 
