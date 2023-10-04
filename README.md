@@ -67,7 +67,7 @@ You can choose one of the supported SMS Gateway Providers outlined below:
 <summary>Using ClickSend</summary>
 
 - Register an account with [ClickSend](https://www.clicksend.com/eu/)
-  - Get the Username and Token from your Dashboard
+  - Get the API Credentials (Username and Token) by clicking the key icon on the top right of your Dashboard
 
 </details>
 
@@ -80,7 +80,7 @@ You can choose one of the supported SMS Gateway Providers outlined below:
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
 - **Optional:** to get Arm/Home/Disarm events sent as status messages you need to explicitly enable them in the PIN Codes settings:  
-  ![PIN-Codes](./assets/D4JOzRXITd.png) 
+  ![PIN-Codes](./assets/D4JOzRXITd.png)
 
 ## Sources & 3rd party credits
 
