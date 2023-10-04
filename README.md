@@ -49,10 +49,28 @@ Since the Raspberry Pi has limited computing power, I prefer to build the image 
 
 ## How to set up
 
+You can choose one of the supported SMS Gateway Providers outlined below:
+
+<details>
+
+<summary>Using CM.com</summary>
+
 - Register an account with [CM.com](https://www.cm.com/)
   - Don't forget to respond to verification SMS and mail
   - Add a balance of at least 15€ (as of time of writing) to unlock the Messaging gateway channel (which allows sending messages)
   - Get the Product token/API key for the Messaging gateway
+
+</details>
+
+<details>
+
+<summary>Using ClickSend</summary>
+
+- Register an account with [ClickSend](https://www.clicksend.com/eu/)
+  - Get the Username and Token from your Dashboard
+
+</details>
+
 - Build and deploy this solution to a system of your choice
   - For example, install Docker CE on a Raspberry Pi 2 and use the provided compose file to permanently run it as a container. There's plenty documentation out there on how to do that so I will not go into details here.
     1) Rename `docker-compose.example.yml` to `docker-compose.yml` and adjust its content accordingly
