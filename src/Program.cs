@@ -35,11 +35,27 @@ builder.Services.AddLogging(config =>
 
 // Config
 IConfigurationSection config = builder.Configuration.GetSection("Service");
+ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
+
+if (serviceConfig is null)
+{
+    throw new ArgumentException("Configuration incomplete!");
+}
+
 builder.Services.Configure<ServiceConfig>(config);
 
 // Gateways
-//builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
-builder.Services.AddTransient<IMessageGateway, ClickSendGateway>();
+switch (serviceConfig.Gateway)
+{
+    case GatewayService.CM:
+        builder.Services.AddTransient<IMessageGateway, CMMessageGateway>();
+        break;
+    case GatewayService.ClickSend:
+        builder.Services.AddTransient<IMessageGateway, ClickSendGateway>();
+        break;
+    default:
+        throw new ArgumentOutOfRangeException(nameof(serviceConfig.Gateway), "Unknown gateway service");
+}
 
 // Refit
 builder.Services.AddTransient<AuthHeaderHandler>();
@@ -70,9 +86,8 @@ builder.Services.AddHostedService<Worker>();
 
 // Database
 string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
-ServiceConfig? serviceConfig = config.Get<ServiceConfig>();
 
-if (string.IsNullOrEmpty(connectionString) || serviceConfig is null)
+if (string.IsNullOrEmpty(connectionString))
 {
     throw new ArgumentException("Configuration incomplete!");
 }

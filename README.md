@@ -80,3 +80,4 @@ This application benefits from these awesome projects ❤ (appearance in no spec
 
 - [LUPUSEC XT1 Handbuch](https://archive.org/details/manualzilla-id-6737868/)
 - [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
+- [ClickSend API - Send SMS](https://developers.clicksend.com/docs/rest/v3/?csharp#send-sms)

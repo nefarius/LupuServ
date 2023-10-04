@@ -16,8 +16,15 @@ public sealed class CMConfig
 public sealed class ClickSendConfig
 {
     public string? Username { get; set; }
-    
+
     public string? Token { get; set; }
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum GatewayService
+{
+    CM,
+    ClickSend
 }
 
 /// <summary>
@@ -30,6 +37,11 @@ public sealed class ServiceConfig
     ///     The port the SMTP server will listen on.
     /// </summary>
     public int Port { get; set; } = 2025;
+
+    /// <summary>
+    ///     The preferred message sending gateway to use.
+    /// </summary>
+    public GatewayService Gateway { get; set; } = GatewayService.ClickSend;
 
     /// <summary>
     ///     CM gateway details.
