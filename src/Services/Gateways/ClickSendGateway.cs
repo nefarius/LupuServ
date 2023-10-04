@@ -17,6 +17,8 @@ public sealed class ClickSendGateway : IMessageGateway
     public async Task<bool> SendMessage(string body, string from, IEnumerable<string> recipients,
         CancellationToken token = default)
     {
+        _logger.LogDebug("Sending message");
+        
         SmsRequest request = new()
         {
             Messages = recipients.Select(to => new SmsRequestMessage { Body = body, Source = from, To = to })

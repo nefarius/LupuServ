@@ -25,6 +25,8 @@ public sealed class CMMessageGateway : IMessageGateway
     public async Task<bool> SendMessage(string body, string from, IEnumerable<string> recipients,
         CancellationToken token = default)
     {
+        _logger.LogDebug("Sending message");
+        
         TextClientResult result = await _textClient
             .SendMessageAsync(body, from, recipients, string.Empty, token)
             .ConfigureAwait(false);
