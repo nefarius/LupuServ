@@ -38,11 +38,11 @@ Some shortcuts have been taken on purpose while developing this proxy applicatio
 
 ## How to build
 
-Here's an example using my own tag (adapt accordingly) and [Podman](https://podman.io/) instead of Docker. Since I plan on running the service on a Raspberry Pi 2 Model B Rev 1.1 (ARM32) and build on Windows amd64 we need to specify the correct target platform:
+Here's an example using my own tag (adapt accordingly). Since I plan on running the service on a Raspberry Pi 2 Model B Rev 1.1 (ARM32) and build on Windows amd64 we need to specify the correct target platform:
 
 ```bash
-podman build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
-podman push nefarius.azurecr.io/lupuserv:latest
+docker build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
+docker push nefarius.azurecr.io/lupuserv:latest
 ```
 
 Since the Raspberry Pi has limited computing power, I prefer to build the image on my main PC and just download and run it on the Pi.
