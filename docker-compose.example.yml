@@ -25,7 +25,7 @@ services:
 
   # MongoDB compatibility wrapper
   lupuserv-ferretdb:
-    image: ghcr.io/ferretdb/ferretdb:1.16.0
+    image: ghcr.io/ferretdb/ferretdb:1.17.0
     container_name: lupuserv-ferretdb
     restart: unless-stopped
     volumes:
