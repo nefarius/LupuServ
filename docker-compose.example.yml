@@ -9,7 +9,9 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Vienna
-      - Service__ApiKey=<your API key here>
+      - Service__Gateway=ClickSend
+      - Service__ClickSend__Username=<YourClickSendUsername>
+      - Service__ClickSend__Token=<YourClickSendToken>
     volumes:
       - ./appsettings.json:/app/appsettings.json:ro
     ports:
