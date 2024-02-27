@@ -4,6 +4,9 @@ using Ardalis.SmartEnum;
 
 namespace LupuServ.Models;
 
+/// <summary>
+///     A type of <see cref="ZoneMobilityEvent"/>.
+/// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public sealed class ZoneMobilityEventType : SmartEnum<ZoneMobilityEventType>
 {

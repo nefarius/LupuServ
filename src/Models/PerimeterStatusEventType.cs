@@ -4,6 +4,9 @@ using Ardalis.SmartEnum;
 
 namespace LupuServ.Models;
 
+/// <summary>
+///     A type of <see cref="PerimeterStatusEvent"/>.
+/// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public sealed class PerimeterStatusEventType : SmartEnum<PerimeterStatusEventType>
 {
