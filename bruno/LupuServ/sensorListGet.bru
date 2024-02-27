@@ -1,0 +1,15 @@
+meta {
+  name: sensorListGet
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://192.168.2.253/action/sensorListGet
+  body: none
+  auth: basic
+}
+
+headers {
+  Authorization: Basic YWRtaW46U2NodXJrZW5zZWN1cml0eQ==
+}
