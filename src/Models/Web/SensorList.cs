@@ -36,4 +36,9 @@ public sealed class Senrow
 
     [JsonProperty("bypass")]
     public string Bypass { get; set; }
+
+    public override string ToString()
+    {
+        return $"Zone: {Zone}, {Name}";
+    }
 }
