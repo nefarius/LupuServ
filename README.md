@@ -55,7 +55,7 @@ them or focus on additional features.
     - There's a rate limit in place for alarm mails to protect against unintended message spam. A shortcoming of the
       current implementation is that once the rate limit is hit, the message is dropped and not re-sent.
 - Only **German language** is supported and tested
-    - As mentioned earlier, I only have access to a German system. From my understanding, the language is hard-coded in
+    - I only have access to a German system. From my understanding, the language is hard-coded in
       whatever firmware is applied and can't be changed, and I am not aware of the availability of other languages. As a
       result, the message parsers created via reverse engineering currently only work with the German firmware variant.
 
