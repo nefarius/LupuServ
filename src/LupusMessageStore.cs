@@ -74,7 +74,7 @@ public class LupusMessageStore : MessageStore
             {
                 _logger.LogError(ex, "Failed to parse alarm event");
             }
-            
+
             string from = _config.From;
             List<string> recipients = _config.Recipients;
 
@@ -116,12 +116,51 @@ public class LupusMessageStore : MessageStore
                 await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
                 _logger.LogDebug("Zone status event inserted into DB");
             }
-
-            if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
-                perimeterEvent is not null)
+            else if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
+                     perimeterEvent is not null)
             {
                 await perimeterEvent.SaveAsync(cancellation: cancellationToken);
                 _logger.LogDebug("Perimeter status event inserted into DB");
+            }
+            else if (SensorStatusEvent.TryParse(message.TextBody, out SensorStatusEvent? statusEvent) &&
+                     statusEvent is not null)
+            {
+                await statusEvent.SaveAsync(cancellation: cancellationToken);
+                _logger.LogDebug("Sensor status event inserted into DB");
+
+                // send critical events to alarm subscribers
+                if (statusEvent.EventType.IsCritical)
+                {
+                    string from = _config.From;
+                    List<string> recipients = _config.Recipients;
+
+                    try
+                    {
+                        SmtpResponse? response = await _rateLimit.ExecuteAsync(async () =>
+                        {
+                            _logger.LogInformation("Will send status SMS to the following recipients: {Recipients}",
+                                string.Join(", ", recipients));
+
+                            bool result =
+                                await _messageGateway.SendMessage(message.TextBody, from, recipients,
+                                    cancellationToken);
+
+                            return result ? SmtpResponse.Ok : SmtpResponse.TransactionFailed;
+                        });
+
+                        _logger.LogDebug("Text client send result: {@Result}", response);
+
+                        return response;
+                    }
+                    catch (RateLimitRejectedException ex)
+                    {
+                        _logger.LogError(ex, "Rate limit hit, message not sent");
+
+                        // TODO: implement retry strategy?
+
+                        return SmtpResponse.TransactionFailed;
+                    }
+                }
             }
         }
         else
