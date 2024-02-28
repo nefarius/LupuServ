@@ -2,6 +2,9 @@
 
 namespace LupuServ;
 
+/// <summary>
+///     CM-API-specific settings.
+/// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public sealed class CMConfig
@@ -12,6 +15,9 @@ public sealed class CMConfig
     public Guid ApiKey { get; set; }
 }
 
+/// <summary>
+///     ClickSend-API-specific settings.
+/// </summary>
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public sealed class ClickSendConfig
 {
@@ -20,11 +26,32 @@ public sealed class ClickSendConfig
     public string? Token { get; set; }
 }
 
+/// <summary>
+///     The supported SMS gateways.
+/// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum GatewayService
 {
     CM,
     ClickSend
+}
+
+public sealed class CentralStationConfig
+{
+    /// <summary>
+    ///     Web Interface base URL.
+    /// </summary>
+    public required Uri Address { get; set; }
+
+    /// <summary>
+    ///     Admin login username.
+    /// </summary>
+    public required string Username { get; set; }
+
+    /// <summary>
+    ///     Admin login password.
+    /// </summary>
+    public required string Password { get; set; }
 }
 
 /// <summary>
@@ -77,4 +104,9 @@ public sealed class ServiceConfig
     ///     Database name.
     /// </summary>
     public string DatabaseName { get; set; } = "lupuserv-events";
+
+    /// <summary>
+    ///     Connection properties for the central station web interface.
+    /// </summary>
+    public required CentralStationConfig CentralStation { get; set; }
 }

@@ -8,16 +8,13 @@ namespace LupuServ.Services.Web;
 /// <summary>
 ///     Injects authentication header into Refit requests.
 /// </summary>
-public class AuthHeaderHandler : DelegatingHandler
+internal class ClickSendBasicAuthHeaderHandler : BasicAuthHeaderHandler
 {
-    private readonly ServiceConfig _config;
-
-    public AuthHeaderHandler(IOptions<ServiceConfig> config)
+    public ClickSendBasicAuthHeaderHandler(IOptions<ServiceConfig> config) : base(config)
     {
-        _config = config.Value;
     }
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         string? username = _config.ClickSend.Username;
@@ -28,6 +25,6 @@ public class AuthHeaderHandler : DelegatingHandler
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", token);
 
-        return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        return base.SendAsync(request, cancellationToken);
     }
 }

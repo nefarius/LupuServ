@@ -1,4 +1,7 @@
-﻿using LupuServ;
+﻿using Coravel;
+
+using LupuServ;
+using LupuServ.Invocables;
 using LupuServ.Services;
 using LupuServ.Services.Gateways;
 using LupuServ.Services.Web;
@@ -57,11 +60,21 @@ switch (serviceConfig.Gateway)
         throw new ArgumentOutOfRangeException(nameof(serviceConfig.Gateway), "Unknown gateway service");
 }
 
-// Refit
-builder.Services.AddTransient<AuthHeaderHandler>();
+// ClickSend API
+builder.Services.AddTransient<ClickSendBasicAuthHeaderHandler>();
 builder.Services.AddRefitClient<IClickSendApi>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://rest.clicksend.com/"))
-    .AddHttpMessageHandler<AuthHeaderHandler>();
+    .AddHttpMessageHandler<ClickSendBasicAuthHeaderHandler>();
+// Central Station Web APIs
+builder.Services.AddTransient<CentralStationBasicAuthHeaderHandler>();
+builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJsonSerializer()))
+    .ConfigureHttpClient(c => c.BaseAddress = serviceConfig.CentralStation.Address)
+    .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>();
+
+// Scheduler
+builder.Services.AddScheduler();
+builder.Services.AddQueue();
+builder.Services.AddTransient<GetSensorListInvocable>();
 
 // SMTP
 builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
@@ -101,4 +114,14 @@ DB.InitAsync(serviceConfig.DatabaseName, MongoClientSettings.FromConnectionStrin
 Log.Logger.Information("Database connected");
 
 IHost host = builder.Build();
+
+// register scheduled jobs
+host.Services.UseScheduler(scheduler =>
+    {
+        scheduler
+            .Schedule<GetSensorListInvocable>()
+            .EveryFifteenMinutes();
+    }
+);
+
 host.Run();

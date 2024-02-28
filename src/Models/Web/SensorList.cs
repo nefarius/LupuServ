@@ -1,39 +1,39 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LupuServ.Models.Web;
 
 public sealed class SensorListResponse
 {
-    [JsonPropertyName("senrows")]
+    [JsonProperty("senrows")]
     public List<Senrow> Senrows { get; set; }
 }
 
 public sealed class Senrow
 {
-    [JsonPropertyName("no")]
+    [JsonProperty("no")]
     public string No { get; set; }
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; }
 
-    [JsonPropertyName("zone")]
+    [JsonProperty("zone")]
     public string Zone { get; set; }
 
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; }
 
-    [JsonPropertyName("attr")]
+    [JsonProperty("attr")]
     public string Attr { get; set; }
 
-    [JsonPropertyName("cond")]
+    [JsonProperty("cond")]
     public string Cond { get; set; }
 
-    [JsonPropertyName("battery")]
+    [JsonProperty("battery")]
     public string Battery { get; set; }
 
-    [JsonPropertyName("tamp")]
+    [JsonProperty("tamp")]
     public string Tamp { get; set; }
 
-    [JsonPropertyName("bypass")]
+    [JsonProperty("bypass")]
     public string Bypass { get; set; }
 }

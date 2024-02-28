@@ -16,6 +16,7 @@
     <ItemGroup>
         <PackageReference Include="Ardalis.SmartEnum" Version="8.0.0"/>
         <PackageReference Include="CM.Text" Version="2.7.0"/>
+        <PackageReference Include="Coravel" Version="5.0.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0"/>
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6"/>
@@ -42,10 +43,6 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Remove="Properties\launchSettings.json"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Util\"/>
     </ItemGroup>
 
 </Project>
