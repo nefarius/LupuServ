@@ -114,19 +114,19 @@ public class LupusMessageStore : MessageStore
                 zoneMobilityEvent is not null)
             {
                 await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogInformation("Zone status event inserted into DB");
+                _logger.LogDebug("Zone status event inserted into DB");
             }
             else if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
                      perimeterEvent is not null)
             {
                 await perimeterEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogInformation("Perimeter status event inserted into DB");
+                _logger.LogDebug("Perimeter status event inserted into DB");
             }
             else if (SensorStatusEvent.TryParse(message.TextBody, out SensorStatusEvent? statusEvent) &&
                      statusEvent is not null)
             {
                 await statusEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogInformation("Sensor status event inserted into DB");
+                _logger.LogDebug("Sensor status event inserted into DB");
 
                 // send critical events to alarm subscribers
                 if (statusEvent.EventType.IsCritical)
