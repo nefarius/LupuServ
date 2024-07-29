@@ -98,7 +98,7 @@ builder.Services.AddSingleton(
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
 
 // Spins up SMTP server instance
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<StartupService>();
 
 // Database
 string? connectionString = builder.Configuration.GetConnectionString("MongoDB");

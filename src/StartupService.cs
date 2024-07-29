@@ -7,14 +7,14 @@ namespace LupuServ;
 /// <summary>
 ///     Performs startup tasks and runs SMTP listener.
 /// </summary>
-public class Worker : BackgroundService
+public class StartupService : BackgroundService
 {
     private readonly IHostEnvironment _environment;
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<StartupService> _logger;
     private readonly IQueue _queue;
     private readonly SmtpServer.SmtpServer _smtpServer;
 
-    public Worker(ILogger<Worker> logger, SmtpServer.SmtpServer smtpServer, IHostEnvironment environment,
+    public StartupService(ILogger<StartupService> logger, SmtpServer.SmtpServer smtpServer, IHostEnvironment environment,
         IQueue queue)
     {
         _logger = logger;
