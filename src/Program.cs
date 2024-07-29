@@ -12,6 +12,7 @@ using MongoDB.Driver;
 using MongoDB.Entities;
 
 using Polly;
+using Polly.Contrib.WaitAndRetry;
 
 using Refit;
 
@@ -69,7 +70,9 @@ builder.Services.AddRefitClient<IClickSendApi>()
 builder.Services.AddTransient<CentralStationBasicAuthHeaderHandler>();
 builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJsonSerializer()))
     .ConfigureHttpClient(c => c.BaseAddress = serviceConfig.CentralStation.Address)
-    .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>();
+    .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>()
+    .AddTransientHttpErrorPolicy(pb =>
+        pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
 
 // Scheduler
 builder.Services.AddScheduler();
