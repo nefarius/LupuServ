@@ -23,6 +23,11 @@ public class GetSensorListInvocable : IInvocable
     {
         SensorListResponse status = await _sensors.GetSensorList();
 
-        throw new NotImplementedException();
+        // TODO: implement me!
+        
+        foreach (Senrow senrow in status.Senrows)
+        {
+            _logger.LogInformation("Sensor result: {Sensor}", senrow);
+        }
     }
 }
