@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Newtonsoft.Json;
 
 namespace LupuServ.Models.Web;
 
@@ -8,10 +10,17 @@ public sealed class SensorListResponse
     public List<Senrow> Senrows { get; set; }
 }
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+public enum BypassState
+{
+    Aktiv,
+    Inaktiv
+}
+
 public sealed class Senrow
 {
     [JsonProperty("no")]
-    public string No { get; set; }
+    public int No { get; set; }
 
     [JsonProperty("type")]
     public string Type { get; set; }
@@ -35,7 +44,7 @@ public sealed class Senrow
     public string Tamp { get; set; }
 
     [JsonProperty("bypass")]
-    public string Bypass { get; set; }
+    public BypassState Bypass { get; set; }
 
     public override string ToString()
     {
