@@ -1,6 +1,4 @@
-<img src="assets/NSS-128x128.png" align="right" />
-
-# LupuServ
+# <img src="assets/NSS-128x128.png" align="left" />LupuServ
 
 [![.NET](https://github.com/nefarius/LupuServ/actions/workflows/dotnet.yml/badge.svg)](https://github.com/nefarius/LupuServ/actions/workflows/dotnet.yml)
 
