@@ -33,6 +33,10 @@ public class StartupService : BackgroundService
 
             return;
         }
+        
+        _logger.LogInformation("Fetching sensor status");
+        
+        _queue.QueueInvocable<GetSensorListInvocable>();
 
         _logger.LogInformation("Starting SMTP server");
 
