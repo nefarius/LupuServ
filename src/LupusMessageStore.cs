@@ -19,6 +19,9 @@ using SmtpServer.Storage;
 
 namespace LupuServ;
 
+/// <summary>
+///     Receives and processes incoming mail messages.
+/// </summary>
 public class LupusMessageStore : MessageStore
 {
     private readonly ServiceConfig _config;

@@ -1,4 +1,7 @@
-﻿using LupuServ;
+﻿using Coravel;
+
+using LupuServ;
+using LupuServ.Invocables;
 using LupuServ.Services;
 using LupuServ.Services.Gateways;
 using LupuServ.Services.Web;
@@ -9,6 +12,7 @@ using MongoDB.Driver;
 using MongoDB.Entities;
 
 using Polly;
+using Polly.Contrib.WaitAndRetry;
 
 using Refit;
 
@@ -57,11 +61,23 @@ switch (serviceConfig.Gateway)
         throw new ArgumentOutOfRangeException(nameof(serviceConfig.Gateway), "Unknown gateway service");
 }
 
-// Refit
-builder.Services.AddTransient<AuthHeaderHandler>();
+// ClickSend API
+builder.Services.AddTransient<ClickSendBasicAuthHeaderHandler>();
 builder.Services.AddRefitClient<IClickSendApi>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://rest.clicksend.com/"))
-    .AddHttpMessageHandler<AuthHeaderHandler>();
+    .AddHttpMessageHandler<ClickSendBasicAuthHeaderHandler>();
+// Central Station Web APIs
+builder.Services.AddTransient<CentralStationBasicAuthHeaderHandler>();
+builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJsonSerializer()))
+    .ConfigureHttpClient(c => c.BaseAddress = serviceConfig.CentralStation.Address)
+    .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>()
+    .AddTransientHttpErrorPolicy(pb =>
+        pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+
+// Scheduler
+builder.Services.AddScheduler();
+builder.Services.AddQueue();
+builder.Services.AddTransient<GetSensorListInvocable>();
 
 // SMTP
 builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
@@ -82,7 +98,7 @@ builder.Services.AddSingleton(
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
 
 // Spins up SMTP server instance
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<StartupService>();
 
 // Database
 string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
@@ -101,4 +117,14 @@ DB.InitAsync(serviceConfig.DatabaseName, MongoClientSettings.FromConnectionStrin
 Log.Logger.Information("Database connected");
 
 IHost host = builder.Build();
+
+// register scheduled jobs
+host.Services.UseScheduler(scheduler =>
+    {
+        scheduler
+            .Schedule<GetSensorListInvocable>()
+            .EveryFifteenMinutes();
+    }
+);
+
 host.Run();
