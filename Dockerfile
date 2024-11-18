@@ -1,7 +1,7 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:8.0.10-alpine3.20-arm32v7 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine-arm32v7 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim-amd64 AS build
 
 WORKDIR /src
 COPY ["src/LupuServ.csproj", "src/"]

@@ -79,7 +79,7 @@ You can choose one of the supported SMS Gateway Providers outlined below:
 <summary>Using CM.com</summary>
 
 - Register an account with [CM.com](https://www.cm.com/)
-    - Don't forget to respond to verification SMS and mail
+    - Remember to respond to verification SMS and mail
     - Add a balance of at least 15€ (as of time of writing) to unlock the Messaging gateway channel (which allows
       sending messages)
     - Get the Product token/API key for the Messaging gateway
@@ -127,3 +127,4 @@ This application benefits from these awesome projects ❤ (appearance in no spec
 - [BuildX for arm64 on .Net 7.0 is broken](https://github.com/dotnet/sdk/issues/28971#issuecomment-1308881150)
 - [ClickSend API - Send SMS](https://developers.clicksend.com/docs/rest/v3/?csharp#send-sms)
 - [LUPUSEC_Keypad Benutzer Handbuch](https://web.archive.org/web/20240228164820/https://www.lupus-electronics.de/shop/documents/LUPUSEC_Keypad.pdf)
+- [Docker .NET Runtime](https://github.com/dotnet/dotnet-docker/blob/main/README.runtime.md)
