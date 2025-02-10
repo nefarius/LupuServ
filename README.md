@@ -68,7 +68,7 @@ docker build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
 docker push nefarius.azurecr.io/lupuserv:latest
 ```
 
-Since the Raspberry Pi has limited computing power, I prefer to build the image on my main PC and just download and run
+Since the Raspberry Pi has limited computing power, I prefer to build the image on my main PC and download and run
 it on the Pi.
 
 ## How to set up
