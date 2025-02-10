@@ -7,16 +7,17 @@ E-Mail to SMS Gateway service for Lupusec XT1 alarm system
 ## Motivation
 
 I happened to know an owner of the very early central alarm system Lupusec XT1 from the German
-company [Lupus Electronics](https://www.lupus-electronics.de/en/), which has been declared End Of Life several years ago
-and doesn't receive firmware updates anymore. It appears, that the manufacturer isn't particularly proud of this early
-revision, as it has become impossible to find resources about it on the company websites (except for the **XT1 Plus**
-which is *not* the system I'm talking about, but a newer platform).
+company [Lupus Electronics](https://www.lupus-electronics.de/en/), which was declared End Of Life several years ago
+and doesn't receive firmware updates anymore. It appears that the manufacturer isn't particularly proud of this early
+revision, as it has become impossible to find resources about it on the company websites. You can still find the **XT1
+Plus** which is *not* the system I'm talking about, but a newer platform.
 
 The system offers a few methods of notifying the outside world about an alarm event, the one in question being able to
 send a classic SMS message to a maximum of two phone numbers. APIs tend to change or become deprecated, and without
-firmware updates there isn't much one can do. Which is exactly what happened here; the SMS gateway implementation broke
+firmware updates, there isn't much one can do. Which is exactly what happened here; the SMS gateway implementation
+broke,
 and thanks to this thing not provide any logs or sources, who knows why. This leaves us with a few different channels to
-grab events from: Contact-ID - which I have no idea what that is and what to do with it - and E-Mail.
+grab events from: Contact-ID (which I have no idea what that is and what to do with it) and E-Mail.
 
 I decided to abuse the E-Mail functionality to receive alarm (and status change) events by faking an SMTP-Server, which
 in turn transforms the mail body and sends it to an SMS gateway in proxy. The application uses .NET 8.0 and is designed
@@ -25,7 +26,7 @@ as a Worker compatible with Docker, so it should run on any supported Linux syst
 ## Supported Systems
 
 The solution has been developed for and tested with the Lupusec XT1 (**not** Plus!) central station running Firmware
-version **1.0.89** and LupuServ hosted on a Raspberry Pi 2 Model B Rev 1.1 (ARM32). Currently two SMS gateway providers
+version **1.0.89** and LupuServ hosted on a Raspberry Pi 2 Model B Rev 1.1 (ARM32). Currently, two SMS gateway providers
 are implemented: [CM.com](https://www.cm.com/about-cm/) and [ClickSend](https://www.clicksend.com/eu/) so you need a
 registered account and top up a minimum balance for either of those.
 
@@ -35,11 +36,11 @@ registered account and top up a minimum balance for either of those.
 - Stores status changes and alarm events in any MongoDB-compatible database
     - The example compose file uses [FerretDB](https://github.com/FerretDB/FerretDB) with
       the [SQLite](https://www.sqlite.org/index.html) backend
-    - This way you can automatically keep a log e.g. off-site on what's going on in the monitored premises
+    - This way you can automatically keep a log e.g., off-site on what's going on in the monitored premises
 
 ## Limitations
 
-Some shortcuts have been taken on purpose while developing this proxy application. As of now I have no plans to rectify
+Some shortcuts have been taken on purpose while developing this proxy application. As of now, I have no plans to rectify
 them or focus on additional features.
 
 - SMTP-Server doesn't use authentication, it accepts any username and password
@@ -60,7 +61,7 @@ them or focus on additional features.
 ## How to build
 
 Here's an example using my own tag (adapt accordingly). Since I plan on running the service on a Raspberry Pi 2 Model B
-Rev 1.1 (ARM32) and build on Windows amd64 we need to specify the correct target platform:
+Rev 1.1 (ARM32) and build on Windows amd64, we need to specify the correct target platform:
 
 ```bash
 docker build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
@@ -105,7 +106,7 @@ You can choose one of the supported SMS Gateway Providers outlined below:
   look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
-- **Optional:** to get Arm/Home/Disarm events sent as status messages you need to explicitly enable them in the PIN
+- **Optional:** to get Arm/Home/Disarm events sent as status messages, you need to explicitly enable them in the PIN
   Codes settings:  
   ![PIN-Codes](./assets/D4JOzRXITd.png)
 
