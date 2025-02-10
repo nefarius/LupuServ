@@ -20,7 +20,7 @@ and thanks to this thing not provide any logs or sources, who knows why. This le
 grab events from: Contact-ID (which I have no idea what that is and what to do with it) and E-Mail.
 
 I decided to abuse the E-Mail functionality to receive alarm (and status change) events by faking an SMTP-Server, which
-in turn transforms the mail body and sends it to an SMS gateway in proxy. The application uses .NET 8.0 and is designed
+in turn transforms the mail body and sends it to an SMS gateway in proxy. The application uses .NET 9.0 and is designed
 as a Worker compatible with Docker, so it should run on any supported Linux system.
 
 ## Supported Systems
