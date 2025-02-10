@@ -97,12 +97,12 @@ You can choose one of the supported SMS Gateway Providers outlined below:
 </details>
 
 - Build and deploy this solution to a system of your choice
-    - For example, install Docker CE on a Raspberry Pi 2 and use the provided compose file to permanently run it as a
-      container. There's plenty documentation out there on how to do that so I will not go into details here.
+    - For example, install Docker CE on a Raspberry Pi 2 and use the provided compose-file to permanently run it as a
+      container. There's plenty of documentation out there on how to do that, so I will not go into details here.
         1) Rename `docker-compose.example.yml` to `docker-compose.yml` and adjust its content accordingly
         2) Rename `appsettings.example.json` to `appsettings.json` and adjust content according to your environment
         3) Run: `docker-compose up -d`
-- Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI so it might
+- Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI, so it might
   look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
 - You can use the Test E-Mail function and should be able to see it appear in the logs
