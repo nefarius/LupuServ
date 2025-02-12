@@ -1,7 +1,7 @@
-﻿
-using LupuServ.Models.Web;
+﻿using LupuServ.Models.Web;
 
 using Refit;
+
 namespace LupuServ.Services.Web;
 
 /// <summary>
