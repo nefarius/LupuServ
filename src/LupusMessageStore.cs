@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 
 using LupuServ.Models;
+using LupuServ.Models.Web;
 using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
 
@@ -27,14 +28,6 @@ public class LupusMessageStore : MessageStore
 {
     private readonly ServiceConfig _config;
 
-    #region Gotify instances
-    
-    private readonly IGotifyAlarmApi? _gotifyAlarmApi;
-    private readonly IGotifyStatusApi? _gotifyStatusApi;
-    private readonly IGotifySystemApi? _gotifySystemApi;
-
-    #endregion
-    
     private readonly ILogger<LupusMessageStore> _logger;
     private readonly IMessageGateway _messageGateway;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
@@ -86,6 +79,16 @@ public class LupusMessageStore : MessageStore
                 {
                     await alarmEvent.SaveAsync(cancellation: cancellationToken);
                     _logger.LogDebug("Alarm event inserted into DB");
+
+                    if (_gotifyAlarmApi is not null)
+                    {
+                        await _gotifyAlarmApi.CreateMessage(new GotifyMessage
+                        {
+                            Title = _config.Gotify!.Alarm!.Title, Message = message.TextBody
+                        });
+
+                        _logger.LogDebug("Alarm event sent via Gotify");
+                    }
                 }
             }
             catch (Exception ex)
@@ -188,4 +191,12 @@ public class LupusMessageStore : MessageStore
 
         return SmtpResponse.Ok;
     }
+
+    #region Gotify instances
+
+    private readonly IGotifyAlarmApi? _gotifyAlarmApi;
+    private readonly IGotifyStatusApi? _gotifyStatusApi;
+    private readonly IGotifySystemApi? _gotifySystemApi;
+
+    #endregion
 }
