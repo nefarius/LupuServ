@@ -17,10 +17,22 @@ public interface IGotifyApi
     Task CreateMessage([Body] GotifyMessage message);
 }
 
+/// <summary>
+///     Gotify instance for status messages.
+/// </summary>
 public interface IGotifyStatusApi : IGotifyApi;
 
+/// <summary>
+///     Gotify instance for alarm messages.
+/// </summary>
 public interface IGotifyAlarmApi : IGotifyApi;
 
+/// <summary>
+///     Gotify instance for system messages (e.g. exceptions).
+/// </summary>
 public interface IGotifySystemApi : IGotifyApi;
 
+/// <summary>
+///     Gotify instance for sensor status messages.
+/// </summary>
 public interface IGotifySensorsApi : IGotifyApi;
