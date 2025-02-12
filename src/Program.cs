@@ -2,7 +2,6 @@
 
 using LupuServ;
 using LupuServ.Invocables;
-using LupuServ.Services;
 using LupuServ.Services.Gateways;
 using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
@@ -74,6 +73,40 @@ builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJson
     .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>()
     .AddTransientHttpErrorPolicy(pb =>
         pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+// Gotify APIs
+GotifyConfig? gotifyConfig = serviceConfig.Gotify;
+if (gotifyConfig is not null)
+{
+    if (gotifyConfig.Status is not null)
+    {
+        builder.Services.AddRefitClient<IGotifyStatusApi>().ConfigureHttpClient(c =>
+        {
+            c.BaseAddress = gotifyConfig.Url;
+            c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.Status.AppToken);
+        }).AddTransientHttpErrorPolicy(pb =>
+            pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+    }
+
+    if (gotifyConfig.Alarm is not null)
+    {
+        builder.Services.AddRefitClient<IGotifyAlarmApi>().ConfigureHttpClient(c =>
+        {
+            c.BaseAddress = gotifyConfig.Url;
+            c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.Alarm.AppToken);
+        }).AddTransientHttpErrorPolicy(pb =>
+            pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+    }
+
+    if (gotifyConfig.System is not null)
+    {
+        builder.Services.AddRefitClient<IGotifySystemApi>().ConfigureHttpClient(c =>
+        {
+            c.BaseAddress = gotifyConfig.Url;
+            c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.System.AppToken);
+        }).AddTransientHttpErrorPolicy(pb =>
+            pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+    }
+}
 
 // Scheduler
 builder.Services.AddScheduler();

@@ -54,24 +54,44 @@ public sealed class CentralStationConfig
     public required string Password { get; set; }
 }
 
+/// <summary>
+///     Message-category-specific Gotify settings.
+/// </summary>
 public sealed class GotifyInstanceConfig
 {
     public required string AppToken { get; set; }
 
-    public string Title { get; set; } = "Status Update";
+    public required string Title { get; set; }
 
     public int Priority { get; set; } = 1;
 
     public bool IsEnabled { get; set; } = true;
 }
 
+/// <summary>
+///     Optional Gotify integration config.
+/// </summary>
 public sealed class GotifyConfig
 {
+    /// <summary>
+    ///     Gotify server instance URL.
+    /// </summary>
     public required Uri Url { get; set; }
 
+    /// <summary>
+    ///     Status message receiver settings.
+    /// </summary>
     public GotifyInstanceConfig? Status { get; set; }
 
+    /// <summary>
+    ///     Alarm message receiver settings.
+    /// </summary>
     public GotifyInstanceConfig? Alarm { get; set; }
+    
+    /// <summary>
+    ///     System message receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? System { get; set; }
 }
 
 /// <summary>
