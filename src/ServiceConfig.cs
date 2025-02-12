@@ -55,6 +55,53 @@ public sealed class CentralStationConfig
 }
 
 /// <summary>
+///     Message-category-specific Gotify settings.
+/// </summary>
+public sealed class GotifyInstanceConfig
+{
+    public Uri? Url { get; set; }
+    
+    public required string AppToken { get; set; }
+
+    public required string Title { get; set; }
+
+    public int Priority { get; set; } = 1;
+
+    public bool IsEnabled { get; set; } = true;
+}
+
+/// <summary>
+///     Optional Gotify integration config.
+/// </summary>
+public sealed class GotifyConfig
+{
+    /// <summary>
+    ///     Gotify server instance URL.
+    /// </summary>
+    public required Uri Url { get; set; }
+    
+    /// <summary>
+    ///     Status message receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? Status { get; set; }
+
+    /// <summary>
+    ///     Alarm message receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? Alarm { get; set; }
+    
+    /// <summary>
+    ///     System message receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? System { get; set; }
+    
+    /// <summary>
+    ///     Sensor status receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? Sensors { get; set; }
+}
+
+/// <summary>
 ///     The dynamic service configuration.
 /// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -63,12 +110,12 @@ public sealed class ServiceConfig
     /// <summary>
     ///     The port the SMTP server will listen on.
     /// </summary>
-    public int Port { get; set; } = 2025;
+    public required int Port { get; set; } = 2025;
 
     /// <summary>
     ///     The preferred message sending gateway to use.
     /// </summary>
-    public GatewayService Gateway { get; set; } = GatewayService.ClickSend;
+    public required GatewayService Gateway { get; set; } = GatewayService.ClickSend;
 
     /// <summary>
     ///     CM gateway details.
@@ -83,17 +130,17 @@ public sealed class ServiceConfig
     /// <summary>
     ///     The user part of the sender address sending status messages.
     /// </summary>
-    public string StatusUser { get; set; } = "status";
+    public required string StatusUser { get; set; } = "status";
 
     /// <summary>
     ///     The user part of the sender address sending alarm messages.
     /// </summary>
-    public string AlarmUser { get; set; } = "alarm";
+    public required string AlarmUser { get; set; } = "alarm";
 
     /// <summary>
     ///     The "Mail From" field content.
     /// </summary>
-    public string From { get; set; } = "Lupusec";
+    public required string From { get; set; } = "Lupusec";
 
     /// <summary>
     ///     One or more phone numbers to relay messages to.
@@ -103,10 +150,15 @@ public sealed class ServiceConfig
     /// <summary>
     ///     Database name.
     /// </summary>
-    public string DatabaseName { get; set; } = "lupuserv-events";
+    public required string DatabaseName { get; set; } = "lupuserv-events";
 
     /// <summary>
     ///     Connection properties for the central station web interface.
     /// </summary>
     public required CentralStationConfig CentralStation { get; set; }
+
+    /// <summary>
+    ///     Optional Gotify integration.
+    /// </summary>
+    public GotifyConfig? Gotify { get; set; }
 }
