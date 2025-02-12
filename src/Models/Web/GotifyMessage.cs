@@ -5,7 +5,7 @@ namespace LupuServ.Models.Web;
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-internal sealed class ExtraClientDisplay
+public sealed class ExtraClientDisplay
 {
     public const string ContentTypeText = "text/plain";
     public const string ContentTypeMarkdown = "text/markdown";
@@ -16,7 +16,7 @@ internal sealed class ExtraClientDisplay
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-internal sealed class GotifyMessageExtras
+public sealed class GotifyMessageExtras
 {
     [JsonPropertyName("client::display")]
     public ExtraClientDisplay? ClientDisplay { get; set; }
@@ -24,7 +24,7 @@ internal sealed class GotifyMessageExtras
 
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-internal sealed class GotifyMessage
+public sealed class GotifyMessage
 {
     [JsonPropertyName("message")]
     public string Message { get; init; } = null!;

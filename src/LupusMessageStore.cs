@@ -1,8 +1,8 @@
 ﻿using System.Buffers;
 
 using LupuServ.Models;
-using LupuServ.Services;
 using LupuServ.Services.Interfaces;
+using LupuServ.Services.Web;
 
 using Microsoft.Extensions.Options;
 
@@ -26,16 +26,30 @@ namespace LupuServ;
 public class LupusMessageStore : MessageStore
 {
     private readonly ServiceConfig _config;
+
+    #region Gotify instances
+    
+    private readonly IGotifyAlarmApi? _gotifyAlarmApi;
+    private readonly IGotifyStatusApi? _gotifyStatusApi;
+    private readonly IGotifySystemApi? _gotifySystemApi;
+
+    #endregion
+    
     private readonly ILogger<LupusMessageStore> _logger;
     private readonly IMessageGateway _messageGateway;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
     public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config,
-        AsyncRateLimitPolicy<SmtpResponse> rateLimit, IMessageGateway messageGateway)
+        AsyncRateLimitPolicy<SmtpResponse> rateLimit, IMessageGateway messageGateway,
+        IGotifySystemApi? gotifySystemApi = null, IGotifyAlarmApi? gotifyAlarmApi = null,
+        IGotifyStatusApi? gotifyStatusApi = null)
     {
         _logger = logger;
         _rateLimit = rateLimit;
         _messageGateway = messageGateway;
+        _gotifySystemApi = gotifySystemApi;
+        _gotifyAlarmApi = gotifyAlarmApi;
+        _gotifyStatusApi = gotifyStatusApi;
         _config = config.Value;
     }
 

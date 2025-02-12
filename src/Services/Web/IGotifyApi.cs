@@ -7,7 +7,7 @@ namespace LupuServ.Services.Web;
 /// <summary>
 ///     Gotify REST API implementation.
 /// </summary>
-internal interface IGotifyApi
+public interface IGotifyApi
 {
     /// <summary>
     ///     Create a message.
@@ -17,8 +17,10 @@ internal interface IGotifyApi
     Task CreateMessage([Body] GotifyMessage message);
 }
 
-internal interface IGotifyStatusApi : IGotifyApi;
+public interface IGotifyStatusApi : IGotifyApi;
 
-internal interface IGotifyAlarmApi : IGotifyApi;
+public interface IGotifyAlarmApi : IGotifyApi;
 
-internal interface IGotifySystemApi : IGotifyApi;
+public interface IGotifySystemApi : IGotifyApi;
+
+public interface IGotifySensorsApi : IGotifyApi;

@@ -81,7 +81,7 @@ if (gotifyConfig is not null)
     {
         builder.Services.AddRefitClient<IGotifyStatusApi>().ConfigureHttpClient(c =>
         {
-            c.BaseAddress = gotifyConfig.Url;
+            c.BaseAddress = gotifyConfig.Status.Url ?? gotifyConfig.Url;
             c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.Status.AppToken);
         }).AddTransientHttpErrorPolicy(pb =>
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
@@ -91,7 +91,7 @@ if (gotifyConfig is not null)
     {
         builder.Services.AddRefitClient<IGotifyAlarmApi>().ConfigureHttpClient(c =>
         {
-            c.BaseAddress = gotifyConfig.Url;
+            c.BaseAddress = gotifyConfig.Alarm.Url ?? gotifyConfig.Url;
             c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.Alarm.AppToken);
         }).AddTransientHttpErrorPolicy(pb =>
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
@@ -101,8 +101,18 @@ if (gotifyConfig is not null)
     {
         builder.Services.AddRefitClient<IGotifySystemApi>().ConfigureHttpClient(c =>
         {
-            c.BaseAddress = gotifyConfig.Url;
+            c.BaseAddress = gotifyConfig.System.Url ?? gotifyConfig.Url;
             c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.System.AppToken);
+        }).AddTransientHttpErrorPolicy(pb =>
+            pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+    }
+    
+    if (gotifyConfig.Sensors is not null)
+    {
+        builder.Services.AddRefitClient<IGotifySensorsApi>().ConfigureHttpClient(c =>
+        {
+            c.BaseAddress = gotifyConfig.Sensors.Url ?? gotifyConfig.Url;
+            c.DefaultRequestHeaders.Add("X-Gotify-Key", gotifyConfig.Sensors.AppToken);
         }).AddTransientHttpErrorPolicy(pb =>
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
     }

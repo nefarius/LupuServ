@@ -59,6 +59,8 @@ public sealed class CentralStationConfig
 /// </summary>
 public sealed class GotifyInstanceConfig
 {
+    public Uri? Url { get; set; }
+    
     public required string AppToken { get; set; }
 
     public required string Title { get; set; }
@@ -77,7 +79,7 @@ public sealed class GotifyConfig
     ///     Gotify server instance URL.
     /// </summary>
     public required Uri Url { get; set; }
-
+    
     /// <summary>
     ///     Status message receiver settings.
     /// </summary>
@@ -92,6 +94,11 @@ public sealed class GotifyConfig
     ///     System message receiver settings.
     /// </summary>
     public GotifyInstanceConfig? System { get; set; }
+    
+    /// <summary>
+    ///     Sensor status receiver settings.
+    /// </summary>
+    public GotifyInstanceConfig? Sensors { get; set; }
 }
 
 /// <summary>
