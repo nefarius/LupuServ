@@ -4,6 +4,7 @@ using LupuServ;
 using LupuServ.Invocables;
 using LupuServ.Services;
 using LupuServ.Services.Gateways;
+using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
 
 using Microsoft.Extensions.Options;

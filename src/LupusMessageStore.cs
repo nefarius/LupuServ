@@ -2,6 +2,7 @@
 
 using LupuServ.Models;
 using LupuServ.Services;
+using LupuServ.Services.Interfaces;
 
 using Microsoft.Extensions.Options;
 
