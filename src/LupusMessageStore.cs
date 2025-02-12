@@ -120,7 +120,15 @@ public class LupusMessageStore : MessageStore
             {
                 _logger.LogError(ex, "Rate limit hit, message not sent");
 
-                // TODO: implement retry strategy?
+                if (_gotifySystemApi is not null)
+                {
+                    await _gotifySystemApi.CreateMessage(new GotifyMessage
+                    {
+                        Title = "Alarm rate limit hit", Message = ex.ToString()
+                    });
+
+                    _logger.LogDebug("System message sent via Gotify");
+                }
 
                 return SmtpResponse.TransactionFailed;
             }
@@ -130,6 +138,16 @@ public class LupusMessageStore : MessageStore
         if (user.Equals(statusUser, StringComparison.InvariantCultureIgnoreCase))
         {
             _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
+
+            if (_gotifyStatusApi is not null)
+            {
+                await _gotifyStatusApi.CreateMessage(new GotifyMessage
+                {
+                    Title = _config.Gotify!.Status!.Title, Message = message.TextBody
+                });
+
+                _logger.LogDebug("Status message sent via Gotify");
+            }
 
             if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent) &&
                 zoneMobilityEvent is not null)
@@ -177,7 +195,15 @@ public class LupusMessageStore : MessageStore
                     {
                         _logger.LogError(ex, "Rate limit hit, message not sent");
 
-                        // TODO: implement retry strategy?
+                        if (_gotifySystemApi is not null)
+                        {
+                            await _gotifySystemApi.CreateMessage(new GotifyMessage
+                            {
+                                Title = "Status rate limit hit", Message = ex.ToString()
+                            });
+
+                            _logger.LogDebug("System message sent via Gotify");
+                        }
 
                         return SmtpResponse.TransactionFailed;
                     }
@@ -187,6 +213,16 @@ public class LupusMessageStore : MessageStore
         else
         {
             _logger.LogWarning("Unknown message received (maybe a test?): {TextBody}", message.TextBody);
+
+            if (_gotifySystemApi is not null)
+            {
+                await _gotifySystemApi.CreateMessage(new GotifyMessage
+                {
+                    Title = "Unknown message received", Message = message.TextBody
+                });
+
+                _logger.LogDebug("System message sent via Gotify");
+            }
         }
 
         return SmtpResponse.Ok;
