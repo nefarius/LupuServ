@@ -1,4 +1,5 @@
 ﻿using LupuServ.Models.Web;
+using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
 
 namespace LupuServ.Services.Gateways;

@@ -2,6 +2,8 @@
 
 using CM.Text;
 
+using LupuServ.Services.Interfaces;
+
 using Microsoft.Extensions.Options;
 
 namespace LupuServ.Services.Gateways;
