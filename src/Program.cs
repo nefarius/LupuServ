@@ -167,7 +167,7 @@ host.Services.UseScheduler(scheduler =>
     {
         scheduler
             .Schedule<GetSensorListInvocable>()
-            .EveryFifteenMinutes();
+            .Daily();
     }
 );
 
