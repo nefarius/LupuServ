@@ -64,8 +64,7 @@ Here's an example using my own tag (adapt accordingly). Since I plan on running 
 Rev 1.1 (ARM32) and build on Windows amd64, we need to specify the correct target platform:
 
 ```bash
-docker build --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
-docker push nefarius.azurecr.io/lupuserv:latest
+docker build --push --platform linux/arm/v7 -t nefarius.azurecr.io/lupuserv:latest .
 ```
 
 Since the Raspberry Pi has limited computing power, I prefer to build the image on my main PC and download and run
