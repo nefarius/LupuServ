@@ -57,6 +57,8 @@ public sealed class CentralStationConfig
 /// <summary>
 ///     Message-category-specific Gotify settings.
 /// </summary>
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public sealed class GotifyInstanceConfig
 {
     public Uri? Url { get; set; }
@@ -73,6 +75,8 @@ public sealed class GotifyInstanceConfig
 /// <summary>
 ///     Optional Gotify integration config.
 /// </summary>
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public sealed class GotifyConfig
 {
     /// <summary>

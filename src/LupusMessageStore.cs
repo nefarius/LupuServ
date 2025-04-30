@@ -84,7 +84,9 @@ public class LupusMessageStore : MessageStore
                     {
                         await _gotifyAlarmApi.CreateMessage(new GotifyMessage
                         {
-                            Title = _config.Gotify!.Alarm!.Title, Message = message.TextBody
+                            Title = _config.Gotify!.Alarm!.Title,
+                            Message = message.TextBody,
+                            Priority = _config.Gotify!.Alarm!.Priority
                         });
 
                         _logger.LogDebug("Alarm event sent via Gotify");
@@ -124,7 +126,9 @@ public class LupusMessageStore : MessageStore
                 {
                     await _gotifySystemApi.CreateMessage(new GotifyMessage
                     {
-                        Title = "Alarm rate limit hit", Message = ex.ToString()
+                        Title = "Alarm rate limit hit",
+                        Message = ex.ToString(),
+                        Priority = _config.Gotify!.System!.Priority
                     });
 
                     _logger.LogDebug("System message sent via Gotify");
@@ -143,7 +147,9 @@ public class LupusMessageStore : MessageStore
             {
                 await _gotifyStatusApi.CreateMessage(new GotifyMessage
                 {
-                    Title = _config.Gotify!.Status!.Title, Message = message.TextBody
+                    Title = _config.Gotify!.Status!.Title,
+                    Message = message.TextBody,
+                    Priority = _config.Gotify!.Status!.Priority
                 });
 
                 _logger.LogDebug("Status message sent via Gotify");
@@ -199,7 +205,9 @@ public class LupusMessageStore : MessageStore
                         {
                             await _gotifySystemApi.CreateMessage(new GotifyMessage
                             {
-                                Title = "Status rate limit hit", Message = ex.ToString()
+                                Title = "Status rate limit hit",
+                                Message = ex.ToString(),
+                                Priority = _config.Gotify!.System!.Priority
                             });
 
                             _logger.LogDebug("System message sent via Gotify");
@@ -218,7 +226,9 @@ public class LupusMessageStore : MessageStore
             {
                 await _gotifySystemApi.CreateMessage(new GotifyMessage
                 {
-                    Title = "Unknown message received", Message = message.TextBody
+                    Title = "Unknown message received",
+                    Message = message.TextBody,
+                    Priority = _config.Gotify!.System!.Priority
                 });
 
                 _logger.LogDebug("System message sent via Gotify");
