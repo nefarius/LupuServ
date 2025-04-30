@@ -77,7 +77,7 @@ builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJson
 GotifyConfig? gotifyConfig = serviceConfig.Gotify;
 if (gotifyConfig is not null)
 {
-    if (gotifyConfig.Status is not null)
+    if (gotifyConfig.Status is not null && gotifyConfig.Status!.IsEnabled)
     {
         builder.Services.AddRefitClient<IGotifyStatusApi>().ConfigureHttpClient(c =>
         {
@@ -87,7 +87,7 @@ if (gotifyConfig is not null)
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
     }
 
-    if (gotifyConfig.Alarm is not null)
+    if (gotifyConfig.Alarm is not null && gotifyConfig.Alarm!.IsEnabled)
     {
         builder.Services.AddRefitClient<IGotifyAlarmApi>().ConfigureHttpClient(c =>
         {
@@ -97,7 +97,7 @@ if (gotifyConfig is not null)
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
     }
 
-    if (gotifyConfig.System is not null)
+    if (gotifyConfig.System is not null && gotifyConfig.System!.IsEnabled)
     {
         builder.Services.AddRefitClient<IGotifySystemApi>().ConfigureHttpClient(c =>
         {
@@ -107,7 +107,7 @@ if (gotifyConfig is not null)
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
     }
     
-    if (gotifyConfig.Sensors is not null)
+    if (gotifyConfig.Sensors is not null && gotifyConfig.Sensors!.IsEnabled)
     {
         builder.Services.AddRefitClient<IGotifySensorsApi>().ConfigureHttpClient(c =>
         {
