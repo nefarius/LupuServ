@@ -90,6 +90,11 @@ public sealed class GotifyInstanceConfig
     ///     Whether the channel will receive any messages.
     /// </summary>
     public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    ///     Optional regular expression to filter out messages with matching content.
+    /// </summary>
+    public string? ExclusionPattern { get; set; }
 }
 
 /// <summary>

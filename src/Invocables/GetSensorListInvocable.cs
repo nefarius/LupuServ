@@ -10,15 +10,17 @@ namespace LupuServ.Invocables;
 /// </summary>
 public class GetSensorListInvocable : IInvocable
 {
+    private readonly ServiceConfig _config;
     private readonly IGotifySensorsApi? _gotifySensorsApi;
     private readonly ILogger<GetSensorListInvocable> _logger;
     private readonly ISensorListApi _sensors;
 
-    public GetSensorListInvocable(ILogger<GetSensorListInvocable> logger, ISensorListApi sensors,
+    public GetSensorListInvocable(ILogger<GetSensorListInvocable> logger, ISensorListApi sensors, ServiceConfig config,
         IGotifySensorsApi? gotifySensorsApi = null)
     {
         _logger = logger;
         _sensors = sensors;
+        _config = config;
         _gotifySensorsApi = gotifySensorsApi;
     }
 
@@ -30,12 +32,13 @@ public class GetSensorListInvocable : IInvocable
         {
             _logger.LogInformation("Sensor result: {Sensor}", senrow);
 
-            if (_gotifySensorsApi is not null)
+            if (_gotifySensorsApi is not null && _config.Gotify!.Sensors!.IsEnabled)
             {
                 await _gotifySensorsApi.CreateMessage(new GotifyMessage
                 {
                     Title = senrow.ToString(),
-                    Message = $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}"
+                    Message = $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}",
+                    Priority = _config.Gotify!.Sensors!.Priority
                 });
             }
         }
