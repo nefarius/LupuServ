@@ -66,6 +66,9 @@ public sealed class CentralStationConfig
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public sealed class GotifyInstanceConfig
 {
+    /// <summary>
+    ///     Optional Gotify server URL, overriding <see cref="GotifyConfig.Url"/>.
+    /// </summary>
     public Uri? Url { get; set; }
     
     /// <summary>
