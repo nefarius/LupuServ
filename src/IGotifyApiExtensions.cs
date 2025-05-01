@@ -1,4 +1,6 @@
-﻿using LupuServ.Models.Web;
+﻿using System.Text.RegularExpressions;
+
+using LupuServ.Models.Web;
 using LupuServ.Services.Web;
 
 namespace LupuServ;
@@ -13,6 +15,12 @@ internal static class GotifyApiExtensions
         }
 
         if (!config.Gotify!.Status!.IsEnabled)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(config.Gotify!.Status!.ExclusionPattern) &&
+            Regex.IsMatch(message, config.Gotify.Status!.ExclusionPattern))
         {
             return;
         }
@@ -36,6 +44,12 @@ internal static class GotifyApiExtensions
             return;
         }
 
+        if (!string.IsNullOrEmpty(config.Gotify!.Sensors!.ExclusionPattern) &&
+            Regex.IsMatch(message, config.Gotify.Sensors!.ExclusionPattern))
+        {
+            return;
+        }
+
         await api.CreateMessage(new GotifyMessage
         {
             Title = title, Message = message, Priority = config.Gotify!.Sensors!.Priority
@@ -54,12 +68,18 @@ internal static class GotifyApiExtensions
             return;
         }
 
+        if (!string.IsNullOrEmpty(config.Gotify!.Alarm!.ExclusionPattern) &&
+            Regex.IsMatch(message, config.Gotify.Alarm!.ExclusionPattern))
+        {
+            return;
+        }
+
         await api.CreateMessage(new GotifyMessage
         {
             Title = config.Gotify!.Alarm!.Title, Message = message, Priority = config.Gotify!.Alarm!.Priority
         });
     }
-    
+
     public static async Task SendMessage(this IGotifySystemApi? api, ServiceConfig config, string title,
         string message)
     {
@@ -69,6 +89,12 @@ internal static class GotifyApiExtensions
         }
 
         if (!config.Gotify!.System!.IsEnabled)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(config.Gotify!.System!.ExclusionPattern) &&
+            Regex.IsMatch(message, config.Gotify.System!.ExclusionPattern))
         {
             return;
         }
