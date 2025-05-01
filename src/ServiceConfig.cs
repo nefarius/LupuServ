@@ -36,6 +36,11 @@ public enum GatewayService
     ClickSend
 }
 
+/// <summary>
+///     Central Station Web Interface login data.
+/// </summary>
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public sealed class CentralStationConfig
 {
     /// <summary>
@@ -63,12 +68,24 @@ public sealed class GotifyInstanceConfig
 {
     public Uri? Url { get; set; }
     
+    /// <summary>
+    ///     The application token to the message channel.
+    /// </summary>
     public required string AppToken { get; set; }
 
+    /// <summary>
+    ///     The title of the message.
+    /// </summary>
     public required string Title { get; set; }
 
+    /// <summary>
+    ///     Optional message priority.
+    /// </summary>
     public int Priority { get; set; } = 1;
 
+    /// <summary>
+    ///     Whether the channel will receive any messages.
+    /// </summary>
     public bool IsEnabled { get; set; } = true;
 }
 
