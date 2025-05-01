@@ -26,7 +26,11 @@ public class GetSensorListInvocable : IInvocable
 
     public async Task Invoke()
     {
+        _logger.LogInformation("Fetching sensor status");
+        
         SensorListResponse status = await _sensors.GetSensorList();
+        
+        _logger.LogInformation("Got sensor status");
 
         foreach (Senrow senrow in status.Senrows)
         {

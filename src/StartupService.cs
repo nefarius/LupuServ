@@ -34,7 +34,7 @@ public class StartupService : BackgroundService
             return;
         }
         
-        _logger.LogInformation("Fetching sensor status");
+        _logger.LogInformation("Queueing fetching sensor status");
         
         _queue.QueueInvocable<GetSensorListInvocable>();
 
