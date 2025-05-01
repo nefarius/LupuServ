@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 
 using LupuServ.Models;
-using LupuServ.Models.Web;
 using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
 
@@ -80,17 +79,7 @@ public class LupusMessageStore : MessageStore
                     await alarmEvent.SaveAsync(cancellation: cancellationToken);
                     _logger.LogDebug("Alarm event inserted into DB");
 
-                    if (_gotifyAlarmApi is not null)
-                    {
-                        await _gotifyAlarmApi.CreateMessage(new GotifyMessage
-                        {
-                            Title = _config.Gotify!.Alarm!.Title,
-                            Message = message.TextBody,
-                            Priority = _config.Gotify!.Alarm!.Priority
-                        });
-
-                        _logger.LogDebug("Alarm event sent via Gotify");
-                    }
+                    await _gotifyAlarmApi.SendMessage(_config, message.TextBody);
                 }
             }
             catch (Exception ex)
@@ -122,17 +111,7 @@ public class LupusMessageStore : MessageStore
             {
                 _logger.LogError(ex, "Rate limit hit, message not sent");
 
-                if (_gotifySystemApi is not null)
-                {
-                    await _gotifySystemApi.CreateMessage(new GotifyMessage
-                    {
-                        Title = "Alarm rate limit hit",
-                        Message = ex.ToString(),
-                        Priority = _config.Gotify!.System!.Priority
-                    });
-
-                    _logger.LogDebug("System message sent via Gotify");
-                }
+                await _gotifySystemApi.SendMessage(_config, "Alarm rate limit hit", ex.ToString());
 
                 return SmtpResponse.TransactionFailed;
             }
@@ -143,17 +122,7 @@ public class LupusMessageStore : MessageStore
         {
             _logger.LogInformation("Received status change: {TextBody}", message.TextBody);
 
-            if (_gotifyStatusApi is not null)
-            {
-                await _gotifyStatusApi.CreateMessage(new GotifyMessage
-                {
-                    Title = _config.Gotify!.Status!.Title,
-                    Message = message.TextBody,
-                    Priority = _config.Gotify!.Status!.Priority
-                });
-
-                _logger.LogDebug("Status message sent via Gotify");
-            }
+            await _gotifyStatusApi.SendMessage(_config, message.TextBody);
 
             if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent) &&
                 zoneMobilityEvent is not null)
@@ -201,17 +170,7 @@ public class LupusMessageStore : MessageStore
                     {
                         _logger.LogError(ex, "Rate limit hit, message not sent");
 
-                        if (_gotifySystemApi is not null)
-                        {
-                            await _gotifySystemApi.CreateMessage(new GotifyMessage
-                            {
-                                Title = "Status rate limit hit",
-                                Message = ex.ToString(),
-                                Priority = _config.Gotify!.System!.Priority
-                            });
-
-                            _logger.LogDebug("System message sent via Gotify");
-                        }
+                        await _gotifySystemApi.SendMessage(_config, "Status rate limit hit", ex.ToString());
 
                         return SmtpResponse.TransactionFailed;
                     }
@@ -222,17 +181,7 @@ public class LupusMessageStore : MessageStore
         {
             _logger.LogWarning("Unknown message received (maybe a test?): {TextBody}", message.TextBody);
 
-            if (_gotifySystemApi is not null)
-            {
-                await _gotifySystemApi.CreateMessage(new GotifyMessage
-                {
-                    Title = "Unknown message received",
-                    Message = message.TextBody,
-                    Priority = _config.Gotify!.System!.Priority
-                });
-
-                _logger.LogDebug("System message sent via Gotify");
-            }
+            await _gotifySystemApi.SendMessage(_config, "Unknown message received", message.TextBody);
         }
 
         return SmtpResponse.Ok;

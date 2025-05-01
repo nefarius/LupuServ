@@ -32,15 +32,11 @@ public class GetSensorListInvocable : IInvocable
         {
             _logger.LogInformation("Sensor result: {Sensor}", senrow);
 
-            if (_gotifySensorsApi is not null && _config.Gotify!.Sensors!.IsEnabled)
-            {
-                await _gotifySensorsApi.CreateMessage(new GotifyMessage
-                {
-                    Title = senrow.ToString(),
-                    Message = $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}",
-                    Priority = _config.Gotify!.Sensors!.Priority
-                });
-            }
+            await _gotifySensorsApi.SendMessage(
+                _config,
+                senrow.ToString(),
+                $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}"
+            );
         }
     }
 }
