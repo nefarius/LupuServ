@@ -3,6 +3,8 @@
 using LupuServ.Models.Web;
 using LupuServ.Services.Web;
 
+using Microsoft.Extensions.Options;
+
 namespace LupuServ.Invocables;
 
 /// <summary>
@@ -10,12 +12,13 @@ namespace LupuServ.Invocables;
 /// </summary>
 public class GetSensorListInvocable : IInvocable
 {
-    private readonly ServiceConfig _config;
+    private readonly IOptions<ServiceConfig> _config;
     private readonly IGotifySensorsApi? _gotifySensorsApi;
     private readonly ILogger<GetSensorListInvocable> _logger;
     private readonly ISensorListApi _sensors;
 
-    public GetSensorListInvocable(ILogger<GetSensorListInvocable> logger, ISensorListApi sensors, ServiceConfig config,
+    public GetSensorListInvocable(ILogger<GetSensorListInvocable> logger, ISensorListApi sensors,
+        IOptions<ServiceConfig> config,
         IGotifySensorsApi? gotifySensorsApi = null)
     {
         _logger = logger;
@@ -26,21 +29,28 @@ public class GetSensorListInvocable : IInvocable
 
     public async Task Invoke()
     {
-        _logger.LogInformation("Fetching sensor status");
-        
-        SensorListResponse status = await _sensors.GetSensorList();
-        
-        _logger.LogInformation("Got sensor status");
-
-        foreach (Senrow senrow in status.Senrows)
+        try
         {
-            _logger.LogInformation("Sensor result: {Sensor}", senrow);
+            _logger.LogInformation("Fetching sensor status");
 
-            await _gotifySensorsApi.SendMessage(
-                _config,
-                senrow.ToString(),
-                $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}"
-            );
+            SensorListResponse status = await _sensors.GetSensorList();
+
+            _logger.LogInformation("Got sensor status");
+
+            foreach (Senrow senrow in status.Senrows)
+            {
+                _logger.LogInformation("Sensor result: {Sensor}", senrow);
+
+                await _gotifySensorsApi.SendMessage(
+                    _config.Value,
+                    senrow.ToString(),
+                    $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failure during sensor status retrieval");
         }
     }
 }
