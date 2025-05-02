@@ -37,6 +37,7 @@ registered account and top up a minimum balance for either of those.
     - The example compose file uses [FerretDB](https://github.com/FerretDB/FerretDB) with
       the [SQLite](https://www.sqlite.org/index.html) backend
     - This way you can automatically keep a log e.g., off-site on what's going on in the monitored premises
+- **New:** Can forward alarm, status, sensor and system messages to any device via [Gotify](https://gotify.net/)!
 
 ## Limitations
 
