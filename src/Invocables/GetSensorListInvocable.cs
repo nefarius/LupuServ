@@ -1,4 +1,6 @@
-﻿using Coravel.Invocable;
+﻿using System.Text;
+
+using Coravel.Invocable;
 
 using LupuServ.Models.Web;
 using LupuServ.Services.Web;
@@ -37,16 +39,22 @@ public class GetSensorListInvocable : IInvocable
 
             _logger.LogInformation("Got sensor status");
 
+            StringBuilder sb = new StringBuilder();
+
             foreach (Senrow senrow in status.Senrows)
             {
                 _logger.LogInformation("Sensor result: {Sensor}", senrow);
 
-                await _gotifySensorsApi.SendMessage(
-                    _config.Value,
-                    senrow.ToString(),
-                    $"Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}"
-                );
+                sb.AppendLine(
+                    $"  - {senrow.ToString()} - Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}");
             }
+
+            await _gotifySensorsApi.SendMessage(
+                _config.Value,
+                sb.ToString()
+            );
+
+            _logger.LogInformation("Done fetching sensor status");
         }
         catch (Exception ex)
         {

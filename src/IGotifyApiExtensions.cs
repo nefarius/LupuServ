@@ -26,8 +26,7 @@ internal static class GotifyApiExtensions
         });
     }
 
-    public static async Task SendMessage(this IGotifySensorsApi? api, ServiceConfig config, string title,
-        string message)
+    public static async Task SendMessage(this IGotifySensorsApi? api, ServiceConfig config, string message)
     {
         if (api is null)
         {
@@ -42,7 +41,7 @@ internal static class GotifyApiExtensions
 
         await api.CreateMessage(new GotifyMessage
         {
-            Title = title, Message = message, Priority = config.Gotify!.Sensors!.Priority
+            Title = config.Gotify!.Sensors!.Title, Message = message, Priority = config.Gotify!.Sensors!.Priority
         });
     }
 
