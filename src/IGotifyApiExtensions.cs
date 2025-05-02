@@ -14,11 +14,6 @@ internal static class GotifyApiExtensions
             return;
         }
 
-        if (!config.Gotify!.Status!.IsEnabled)
-        {
-            return;
-        }
-
         if (!string.IsNullOrEmpty(config.Gotify!.Status!.ExclusionPattern) &&
             Regex.IsMatch(message, config.Gotify.Status!.ExclusionPattern))
         {
@@ -35,11 +30,6 @@ internal static class GotifyApiExtensions
         string message)
     {
         if (api is null)
-        {
-            return;
-        }
-
-        if (!config.Gotify!.Sensors!.IsEnabled)
         {
             return;
         }
@@ -63,11 +53,6 @@ internal static class GotifyApiExtensions
             return;
         }
 
-        if (!config.Gotify!.Alarm!.IsEnabled)
-        {
-            return;
-        }
-
         if (!string.IsNullOrEmpty(config.Gotify!.Alarm!.ExclusionPattern) &&
             Regex.IsMatch(message, config.Gotify.Alarm!.ExclusionPattern))
         {
@@ -84,11 +69,6 @@ internal static class GotifyApiExtensions
         string message)
     {
         if (api is null)
-        {
-            return;
-        }
-
-        if (!config.Gotify!.System!.IsEnabled)
         {
             return;
         }
