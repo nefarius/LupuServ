@@ -17,7 +17,6 @@ using Polly.Contrib.WaitAndRetry;
 using Refit;
 
 using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 
 using SmtpServer;
 using SmtpServer.Protocol;
@@ -31,7 +30,10 @@ builder.Services.AddLogging(config =>
     config.ClearProviders();
 
     Log.Logger = new LoggerConfiguration()
-        .WriteTo.Console(applyThemeToRedirectedOutput: true, theme: AnsiConsoleTheme.Literate)
+        .ReadFrom.Configuration(builder.Configuration)
+#if DEBUG
+        .MinimumLevel.Debug()
+#endif
         .CreateBootstrapLogger();
 
     config.AddSerilog(Log.Logger);
@@ -106,7 +108,7 @@ if (gotifyConfig is not null)
         }).AddTransientHttpErrorPolicy(pb =>
             pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
     }
-    
+
     if (gotifyConfig.Sensors is not null && gotifyConfig.Sensors!.IsEnabled)
     {
         builder.Services.AddRefitClient<IGotifySensorsApi>().ConfigureHttpClient(c =>
