@@ -22,7 +22,14 @@ internal static class GotifyApiExtensions
 
         await api.CreateMessage(new GotifyMessage
         {
-            Title = config.Gotify!.Status!.Title, Message = message, Priority = config.Gotify!.Status!.Priority
+            Title = config.Gotify!.Status!.Title,
+            Message = message,
+            Priority = config.Gotify!.Status!.Priority,
+            Extras = new GotifyMessageExtras
+            {
+                ClientDisplay =
+                    new ExtraClientDisplay { ContentType = ExtraClientDisplay.ContentTypeMarkdown }
+            }
         });
     }
 
@@ -41,7 +48,14 @@ internal static class GotifyApiExtensions
 
         await api.CreateMessage(new GotifyMessage
         {
-            Title = config.Gotify!.Sensors!.Title, Message = message, Priority = config.Gotify!.Sensors!.Priority
+            Title = config.Gotify!.Sensors!.Title,
+            Message = message,
+            Priority = config.Gotify!.Sensors!.Priority,
+            Extras = new GotifyMessageExtras
+            {
+                ClientDisplay =
+                    new ExtraClientDisplay { ContentType = ExtraClientDisplay.ContentTypeMarkdown }
+            }
         });
     }
 
@@ -60,7 +74,14 @@ internal static class GotifyApiExtensions
 
         await api.CreateMessage(new GotifyMessage
         {
-            Title = config.Gotify!.Alarm!.Title, Message = message, Priority = config.Gotify!.Alarm!.Priority
+            Title = config.Gotify!.Alarm!.Title,
+            Message = message,
+            Priority = config.Gotify!.Alarm!.Priority,
+            Extras = new GotifyMessageExtras
+            {
+                ClientDisplay =
+                    new ExtraClientDisplay { ContentType = ExtraClientDisplay.ContentTypeMarkdown }
+            }
         });
     }
 
@@ -80,7 +101,14 @@ internal static class GotifyApiExtensions
 
         await api.CreateMessage(new GotifyMessage
         {
-            Title = title, Message = message, Priority = config.Gotify!.System!.Priority
+            Title = title,
+            Message = message,
+            Priority = config.Gotify!.System!.Priority,
+            Extras = new GotifyMessageExtras
+            {
+                ClientDisplay =
+                    new ExtraClientDisplay { ContentType = ExtraClientDisplay.ContentTypeMarkdown }
+            }
         });
     }
 }

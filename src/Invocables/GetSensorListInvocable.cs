@@ -39,14 +39,19 @@ public class GetSensorListInvocable : IInvocable
 
             _logger.LogInformation("Got sensor status");
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
+
+            sb.AppendLine("""
+                          | Sensor | Status |
+                          | --- | --- |
+                          """);
 
             foreach (Senrow senrow in status.Senrows)
             {
                 _logger.LogInformation("Sensor result: {Sensor}", senrow);
 
                 sb.AppendLine(
-                    $"  - {senrow.ToString()} - Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp}");
+                    $"| {senrow.ToString()} | Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp} |");
             }
 
             await _gotifySensorsApi.SendMessage(
