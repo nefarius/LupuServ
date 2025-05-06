@@ -1,4 +1,6 @@
-﻿using Coravel;
+﻿using System.Net;
+
+using Coravel;
 
 using LupuServ;
 using LupuServ.Invocables;
@@ -73,8 +75,17 @@ builder.Services.AddTransient<CentralStationBasicAuthHeaderHandler>();
 builder.Services.AddRefitClient<ISensorListApi>(new RefitSettings(new BrokenJsonSerializer()))
     .ConfigureHttpClient(c => c.BaseAddress = serviceConfig.CentralStation.Address)
     .AddHttpMessageHandler<CentralStationBasicAuthHeaderHandler>()
-    .AddTransientHttpErrorPolicy(pb =>
-        pb.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10)));
+    .AddPolicyHandler(Policy<HttpResponseMessage>
+        .HandleResult(msg =>
+            msg.StatusCode == HttpStatusCode.Unauthorized || // explicitly retry on 401
+            ((int)msg.StatusCode >= 500 && (int)msg.StatusCode <= 599)) // transient 5xx errors
+        .WaitAndRetryAsync(
+            3,
+            retryAttempt => Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 10).ToArray()[retryAttempt],
+            (response, timespan, retryCount, context) =>
+            {
+                Log.Logger.Warning("Retry {RetryCount} after {ResultStatusCode}", retryCount, response.Result.StatusCode);
+            }));
 // Gotify APIs
 GotifyConfig? gotifyConfig = serviceConfig.Gotify;
 if (gotifyConfig is not null)
@@ -127,18 +138,17 @@ builder.Services.AddTransient<GetSensorListInvocable>();
 
 // SMTP
 builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
-builder.Services.AddSingleton(
-    provider =>
-    {
-        IOptions<ServiceConfig> cfg = provider.GetRequiredService<IOptions<ServiceConfig>>();
+builder.Services.AddSingleton(provider =>
+{
+    IOptions<ServiceConfig> cfg = provider.GetRequiredService<IOptions<ServiceConfig>>();
 
-        ISmtpServerOptions? options = new SmtpServerOptionsBuilder()
-            .ServerName("SMTP Server")
-            .Port(cfg.Value.Port)
-            .Build();
+    ISmtpServerOptions? options = new SmtpServerOptionsBuilder()
+        .ServerName("SMTP Server")
+        .Port(cfg.Value.Port)
+        .Build();
 
-        return new SmtpServer.SmtpServer(options, provider.GetRequiredService<IServiceProvider>());
-    });
+    return new SmtpServer.SmtpServer(options, provider.GetRequiredService<IServiceProvider>());
+});
 
 // Singleton because there is one sender API to protect across multiple incoming messages
 builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.FromSeconds(5)));
