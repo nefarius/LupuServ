@@ -42,8 +42,8 @@ public class GetSensorListInvocable : IInvocable
             StringBuilder sb = new();
 
             sb.AppendLine("""
-                          | Sensor | Status |
-                          | --- | --- |
+                          | Sensor | Battery | Bypass | Tampering |
+                          | --- | --- | --- | --- |
                           """);
 
             foreach (Senrow senrow in status.Senrows)
@@ -51,7 +51,7 @@ public class GetSensorListInvocable : IInvocable
                 _logger.LogInformation("Sensor result: {Sensor}", senrow);
 
                 sb.AppendLine(
-                    $"| {senrow.ToString()} | Battery: {senrow.Battery}, Bypass: {senrow.Bypass}, Tampering: {senrow.Tamp} |");
+                    $"| {senrow.ToString()} | {senrow.Battery} | {senrow.Bypass} | {senrow.Tamp} |");
             }
 
             await _gotifySensorsApi.SendMessage(
