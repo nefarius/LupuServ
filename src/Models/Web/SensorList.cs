@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace LupuServ.Models.Web;
 
+/// <summary>
+///     Central Station sensor list response.
+/// </summary>
 public sealed class SensorListResponse
 {
     [JsonProperty("senrows")]
@@ -18,6 +21,9 @@ public enum BypassState
     Inaktiv
 }
 
+/// <summary>
+///     Sensor row.
+/// </summary>
 public sealed class Senrow
 {
     [JsonProperty("no")]
