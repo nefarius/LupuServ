@@ -14,6 +14,9 @@ public sealed class SensorListResponse
     public List<Senrow> Senrows { get; set; }
 }
 
+/// <summary>
+///     Sensors with active bypass do not trigger an alarm, if tampering is detected.
+/// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum BypassState
 {
