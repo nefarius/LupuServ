@@ -27,7 +27,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="MongoDB.Entities" Version="24.1.1"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Polly" Version="8.6.2" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
         <PackageReference Include="Refit" Version="8.0.0"/>
@@ -38,7 +38,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
         <PackageReference Include="SmtpServer" Version="11.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
-        <PackageReference Include="Tiny.RestClient" Version="1.7.1"/>
+        <PackageReference Include="Tiny.RestClient" Version="1.7.2"/>
     </ItemGroup>
 
     <ItemGroup>
