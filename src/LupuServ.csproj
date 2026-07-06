@@ -30,7 +30,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Polly" Version="8.7.0" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-        <PackageReference Include="Refit" Version="12.1.0"/>
+        <PackageReference Include="Refit" Version="13.1.0"/>
         <PackageReference Include="Refit.HttpClientFactory" Version="12.1.0"/>
         <PackageReference Include="Serilog" Version="4.3.1"/>
         <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0"/>
