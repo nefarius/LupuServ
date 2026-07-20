@@ -38,7 +38,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1"/>
         <PackageReference Include="SmtpServer" Version="11.1.0"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
-        <PackageReference Include="Tiny.RestClient" Version="1.7.2"/>
+        <PackageReference Include="Tiny.RestClient" Version="2.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
