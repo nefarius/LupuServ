@@ -105,13 +105,16 @@ You can choose one of the supported SMS Gateway Providers outlined below:
         1) Rename `docker-compose.example.yml` to `docker-compose.yml` and adjust its content accordingly
         2) Rename `appsettings.example.json` to `appsettings.json` and adjust content according to your environment
            (the database name and credentials live in `ConnectionStrings:Events`; there is no separate
-           `Service:DatabaseName` setting anymore)
+           `Service:DatabaseName` setting anymore). Compose `POSTGRES_USER`, `POSTGRES_PASSWORD`, and
+           `POSTGRES_DB` must match the Username, Password, and Database values in that connection string.
         3) Run: `docker-compose up -d`
 - **Optional: host PostgreSQL elsewhere** (NAS, VPS, managed service). Remove the `lupuserv-postgres`
   service and its `depends_on` from the compose file, then set `ConnectionStrings:Events` to the remote
   host. Prefer WireGuard or Tailscale and keep port 5432 off the public internet. If you must expose
   Postgres directly, use `SSL Mode=VerifyFull` with a root certificate — `SSL Mode=Require` encrypts
-  without validating the server certificate. Short timeouts (`Timeout=5;Command Timeout=10`) are
+  without validating the server certificate. Mount the CA into the app container at the same path as
+  `Root Certificate` (the example compose file uses `/path/to/ca.crt`, e.g.
+  `./certs/ca.crt:/path/to/ca.crt:ro`). Short timeouts (`Timeout=5;Command Timeout=10`) are
   recommended so a dead link does not park the background writer.
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI, so it might
   look different on your system):

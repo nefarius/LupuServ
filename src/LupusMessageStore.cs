@@ -79,12 +79,19 @@ public class LupusMessageStore : MessageStore
                 if (AlarmEvent.TryParse(message.TextBody, out AlarmEvent? alarmEvent) &&
                     alarmEvent is not null)
                 {
-                    // Gotify before persistence so a DB outage cannot suppress the push
-                    await _gotifyAlarmApi.SendMessage(_config, message.TextBody);
-
+                    // Queue first so a Gotify failure cannot drop the event
                     _queue.QueueInvocableWithPayload<StoreEventInvocable, EventRecord>(
                         alarmEvent.ToRecord(message.TextBody));
                     _logger.LogDebug("Alarm event queued for DB insert");
+
+                    try
+                    {
+                        await _gotifyAlarmApi.SendMessage(_config, message.TextBody);
+                    }
+                    catch (Exception gotifyEx)
+                    {
+                        _logger.LogError(gotifyEx, "Failed to send Gotify alarm push");
+                    }
                 }
             }
             catch (Exception ex)

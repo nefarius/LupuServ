@@ -14,6 +14,8 @@ services:
       - Service__ClickSend__Token=<YourClickSendToken>
     volumes:
       - ./appsettings.json:/app/appsettings.json:ro
+      # Uncomment when using a remote Postgres with SSL Mode=VerifyFull:
+      # - ./certs/ca.crt:/path/to/ca.crt:ro
     ports:
       - 2025:2025
     networks:
@@ -35,6 +37,7 @@ services:
       # Postgres 18+ expects the volume at /var/lib/postgresql (not .../data)
       - ./data/postgres:/var/lib/postgresql
     environment:
+      # Must match Username / Password / Database in ConnectionStrings:Events
       - POSTGRES_USER=lupuserv
       - POSTGRES_PASSWORD=<password>
       - POSTGRES_DB=lupuserv-events
@@ -54,6 +57,7 @@ services:
   # Remove the lupuserv-postgres service and the depends_on block above, then set
   # ConnectionStrings:Events in appsettings.json to your remote host, e.g.:
   #   Host=<remote>;Port=5432;Database=lupuserv-events;Username=lupuserv;Password=<password>;Timeout=5;Command Timeout=10;SSL Mode=VerifyFull;Root Certificate=/path/to/ca.crt
+  # Mount the CA into the app container (see volumes above) at the same path as Root Certificate.
   # Prefer WireGuard/Tailscale and keep 5432 off the public internet.
   # Note: SSL Mode=Require encrypts without validating the server certificate; use VerifyFull for MITM protection.
 
