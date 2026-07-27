@@ -1,5 +1,8 @@
 ﻿using System.Buffers;
 
+using Coravel.Queuing.Interfaces;
+
+using LupuServ.Invocables;
 using LupuServ.Models;
 using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
@@ -7,8 +10,6 @@ using LupuServ.Services.Web;
 using Microsoft.Extensions.Options;
 
 using MimeKit;
-
-using MongoDB.Entities;
 
 using Polly.RateLimit;
 
@@ -29,16 +30,18 @@ public class LupusMessageStore : MessageStore
 
     private readonly ILogger<LupusMessageStore> _logger;
     private readonly IMessageGateway _messageGateway;
+    private readonly IQueue _queue;
     private readonly AsyncRateLimitPolicy<SmtpResponse> _rateLimit;
 
     public LupusMessageStore(ILogger<LupusMessageStore> logger, IOptions<ServiceConfig> config,
-        AsyncRateLimitPolicy<SmtpResponse> rateLimit, IMessageGateway messageGateway,
+        AsyncRateLimitPolicy<SmtpResponse> rateLimit, IMessageGateway messageGateway, IQueue queue,
         IGotifySystemApi? gotifySystemApi = null, IGotifyAlarmApi? gotifyAlarmApi = null,
         IGotifyStatusApi? gotifyStatusApi = null)
     {
         _logger = logger;
         _rateLimit = rateLimit;
         _messageGateway = messageGateway;
+        _queue = queue;
         _gotifySystemApi = gotifySystemApi;
         _gotifyAlarmApi = gotifyAlarmApi;
         _gotifyStatusApi = gotifyStatusApi;
@@ -76,10 +79,19 @@ public class LupusMessageStore : MessageStore
                 if (AlarmEvent.TryParse(message.TextBody, out AlarmEvent? alarmEvent) &&
                     alarmEvent is not null)
                 {
-                    await alarmEvent.SaveAsync(cancellation: cancellationToken);
-                    _logger.LogDebug("Alarm event inserted into DB");
+                    // Queue first so a Gotify failure cannot drop the event
+                    _queue.QueueInvocableWithPayload<StoreEventInvocable, EventRecord>(
+                        alarmEvent.ToRecord(message.TextBody));
+                    _logger.LogDebug("Alarm event queued for DB insert");
 
-                    await _gotifyAlarmApi.SendMessage(_config, message.TextBody);
+                    try
+                    {
+                        await _gotifyAlarmApi.SendMessage(_config, message.TextBody);
+                    }
+                    catch (Exception gotifyEx)
+                    {
+                        _logger.LogError(gotifyEx, "Failed to send Gotify alarm push");
+                    }
                 }
             }
             catch (Exception ex)
@@ -127,20 +139,23 @@ public class LupusMessageStore : MessageStore
             if (ZoneMobilityEvent.TryParse(message.TextBody, out ZoneMobilityEvent? zoneMobilityEvent) &&
                 zoneMobilityEvent is not null)
             {
-                await zoneMobilityEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogDebug("Zone status event inserted into DB");
+                _queue.QueueInvocableWithPayload<StoreEventInvocable, EventRecord>(
+                    zoneMobilityEvent.ToRecord(message.TextBody));
+                _logger.LogDebug("Zone status event queued for DB insert");
             }
             else if (PerimeterStatusEvent.TryParse(message.TextBody, out PerimeterStatusEvent? perimeterEvent) &&
                      perimeterEvent is not null)
             {
-                await perimeterEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogDebug("Perimeter status event inserted into DB");
+                _queue.QueueInvocableWithPayload<StoreEventInvocable, EventRecord>(
+                    perimeterEvent.ToRecord(message.TextBody));
+                _logger.LogDebug("Perimeter status event queued for DB insert");
             }
             else if (SensorStatusEvent.TryParse(message.TextBody, out SensorStatusEvent? statusEvent) &&
                      statusEvent is not null)
             {
-                await statusEvent.SaveAsync(cancellation: cancellationToken);
-                _logger.LogDebug("Sensor status event inserted into DB");
+                _queue.QueueInvocableWithPayload<StoreEventInvocable, EventRecord>(
+                    statusEvent.ToRecord(message.TextBody));
+                _logger.LogDebug("Sensor status event queued for DB insert");
 
                 // send critical events to alarm subscribers
                 if (statusEvent.EventType.IsCritical)

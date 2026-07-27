@@ -177,11 +177,6 @@ public sealed class ServiceConfig
     public List<string> Recipients { get; set; } = new();
 
     /// <summary>
-    ///     Database name.
-    /// </summary>
-    public required string DatabaseName { get; set; } = "lupuserv-events";
-
-    /// <summary>
     ///     Connection properties for the central station web interface.
     /// </summary>
     public required CentralStationConfig CentralStation { get; set; }

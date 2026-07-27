@@ -1,20 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-using MongoDB.Entities;
-
 namespace LupuServ.Models;
 
 /// <summary>
 ///     Represents a special sensor status event.
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public sealed partial class SensorStatusEvent : Entity
+public sealed partial class SensorStatusEvent
 {
     /// <summary>
     ///     Creation timestamp.
     /// </summary>
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>
     ///     Gets the Zone ID (Sensor number).
@@ -33,6 +31,12 @@ public sealed partial class SensorStatusEvent : Entity
 
     [GeneratedRegex(@"^Zone:(\d*) ([a-zA-Z\u00F0-\u02AF0-9 _.-]*), ([a-zA-Z\u00F0-\u02AF0-9 _.-]*)$")]
     private static partial Regex SensorStatusRegex();
+
+    /// <summary>
+    ///     Maps this event to a flat store row.
+    /// </summary>
+    public EventRecord ToRecord(string? rawMessage) =>
+        new(CreatedAt, "SensorStatus", EventType.Name, EventType.Value, ZoneId, SensorName, null, rawMessage);
 
     public static bool TryParse(string message, out SensorStatusEvent? parsedEvent)
     {
@@ -55,7 +59,7 @@ public sealed partial class SensorStatusEvent : Entity
 
         parsedEvent = new SensorStatusEvent
         {
-            CreatedAt = DateTime.Now, ZoneId = zoneId, SensorName = sensorName, EventType = eventType
+            CreatedAt = DateTimeOffset.UtcNow, ZoneId = zoneId, SensorName = sensorName, EventType = eventType
         };
 
         return true;

@@ -33,10 +33,13 @@ registered account and top up a minimum balance for either of those.
 ## Features
 
 - Can send messages to more than two recipients (limit of original firmware)
-- Stores status changes and alarm events in any MongoDB-compatible database
-    - The example compose file uses [FerretDB](https://github.com/FerretDB/FerretDB) with
-      the [SQLite](https://www.sqlite.org/index.html) backend
-    - This way you can automatically keep a log e.g., off-site on what's going on in the monitored premises
+- Stores status changes and alarm events in [PostgreSQL](https://www.postgresql.org/)
+    - The example compose file runs Postgres on the same host (official images still
+      publish `linux/arm/v7` for Raspberry Pi 2)
+    - Persistence is queued in the background so a remote or unavailable database never
+      delays alarm SMS delivery
+    - You can point `ConnectionStrings:Events` at an off-site host instead (see compose
+      comments and the notes below) to keep a log away from the monitored premises
 - **New:** Can forward alarm, status, sensor and system messages to any device via [Gotify](https://gotify.net/)!
 
 ## Limitations
@@ -101,7 +104,18 @@ You can choose one of the supported SMS Gateway Providers outlined below:
       container. There's plenty of documentation out there on how to do that, so I will not go into details here.
         1) Rename `docker-compose.example.yml` to `docker-compose.yml` and adjust its content accordingly
         2) Rename `appsettings.example.json` to `appsettings.json` and adjust content according to your environment
+           (the database name and credentials live in `ConnectionStrings:Events`; there is no separate
+           `Service:DatabaseName` setting anymore). Compose `POSTGRES_USER`, `POSTGRES_PASSWORD`, and
+           `POSTGRES_DB` must match the Username, Password, and Database values in that connection string.
         3) Run: `docker-compose up -d`
+- **Optional: host PostgreSQL elsewhere** (NAS, VPS, managed service). Remove the `lupuserv-postgres`
+  service and its `depends_on` from the compose file, then set `ConnectionStrings:Events` to the remote
+  host. Prefer WireGuard or Tailscale and keep port 5432 off the public internet. If you must expose
+  Postgres directly, use `SSL Mode=VerifyFull` with a root certificate — `SSL Mode=Require` encrypts
+  without validating the server certificate. Mount the CA into the app container at the same path as
+  `Root Certificate` (the example compose file uses `/path/to/ca.crt`, e.g.
+  `./certs/ca.crt:/path/to/ca.crt:ro`). Short timeouts (`Timeout=5;Command Timeout=10`) are
+  recommended so a dead link does not park the background writer.
 - Configure the E-Mail settings on the XT1 web interface as shown below (I only had access to a German UI, so it might
   look different on your system):
   ![Settings](./assets/ygJiBqVo8R.png)
@@ -118,8 +132,8 @@ This application benefits from these awesome projects ❤ (appearance in no spec
 - [MimeKit](https://github.com/jstedfast/MimeKit)
 - [SmtpServer](https://github.com/cosullivan/SmtpServer)
 - [Polly](https://github.com/App-vNext/Polly#rate-limit)
-- [MongoDB.Entities](https://mongodb-entities.com/)
-- [FerretDB](https://www.ferretdb.io/)
+- [Npgsql](https://www.npgsql.org/)
+- [PostgreSQL](https://www.postgresql.org/)
 - [Refit](https://github.com/reactiveui/refit)
 
 ### References
