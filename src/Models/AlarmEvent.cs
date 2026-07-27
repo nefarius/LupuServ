@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-using MongoDB.Entities;
-
 // ReSharper disable InvertIf
 
 namespace LupuServ.Models;
@@ -11,12 +9,12 @@ namespace LupuServ.Models;
 ///     Represents an alarm or sabotage event.
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public sealed partial class AlarmEvent : Entity
+public sealed partial class AlarmEvent
 {
     /// <summary>
     ///     Creation timestamp.
     /// </summary>
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>
     ///     Gets the Zone ID (Sensor number). Not every message includes a zone identifier.
@@ -51,9 +49,15 @@ public sealed partial class AlarmEvent : Entity
     [GeneratedRegex(@"^(Sabotage Alarm deaktiviert gemeldet von Sensor) ([a-zA-Z\u00F0-\u02AF0-9 _.-]*)$")]
     private static partial Regex SabotageAlarmDisabledSensorReportedRegex();
 
+    /// <summary>
+    ///     Maps this event to a flat store row.
+    /// </summary>
+    public EventRecord ToRecord(string? rawMessage) =>
+        new(CreatedAt, "Alarm", EventType.Name, EventType.Value, ZoneId, SensorName, null, rawMessage);
+
     public static bool TryParse(string message, out AlarmEvent? parsedEvent)
     {
-        parsedEvent = new AlarmEvent { CreatedAt = DateTime.Now };
+        parsedEvent = new AlarmEvent { CreatedAt = DateTimeOffset.UtcNow };
 
         Match match = SabotageAlarmRegex().Match(message);
 

@@ -18,29 +18,44 @@ services:
       - 2025:2025
     networks:
       - database
-    depends_on: 
-      - lupuserv-ferretdb
+    depends_on:
+      lupuserv-postgres:
+        condition: service_healthy
     logging:
       options:
         max-size: "10m"
         max-file: "3"
 
-  # MongoDB compatibility wrapper
-  lupuserv-ferretdb:
-    image: ghcr.io/ferretdb/ferretdb:1.24.0
-    container_name: lupuserv-ferretdb
+  # Event log database (PostgreSQL). Official images still ship linux/arm/v7 for Pi 2.
+  lupuserv-postgres:
+    image: postgres:18-alpine
+    container_name: lupuserv-postgres
     restart: unless-stopped
     volumes:
-      - ./data/sqlite:/data
+      # Postgres 18+ expects the volume at /var/lib/postgresql (not .../data)
+      - ./data/postgres:/var/lib/postgresql
     environment:
-      - FERRETDB_HANDLER=sqlite
-      - FERRETDB_SQLITE_URL=file:/data/
+      - POSTGRES_USER=lupuserv
+      - POSTGRES_PASSWORD=<password>
+      - POSTGRES_DB=lupuserv-events
     networks:
       - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lupuserv -d lupuserv-events"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-      
+
+  # --- Optional: host the DB elsewhere ---
+  # Remove the lupuserv-postgres service and the depends_on block above, then set
+  # ConnectionStrings:Events in appsettings.json to your remote host, e.g.:
+  #   Host=<remote>;Port=5432;Database=lupuserv-events;Username=lupuserv;Password=<password>;Timeout=5;Command Timeout=10;SSL Mode=VerifyFull;Root Certificate=/path/to/ca.crt
+  # Prefer WireGuard/Tailscale and keep 5432 off the public internet.
+  # Note: SSL Mode=Require encrypts without validating the server certificate; use VerifyFull for MITM protection.
+
 networks:
   database:

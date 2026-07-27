@@ -1,20 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-using MongoDB.Entities;
-
 namespace LupuServ.Models;
 
 /// <summary>
 ///     Represents a perimeter status event.
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public sealed partial class PerimeterStatusEvent : Entity
+public sealed partial class PerimeterStatusEvent
 {
     /// <summary>
     ///     Creation timestamp.
     /// </summary>
-    public DateTime CreatedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>
     ///     Gets the username that initiated the event.
@@ -28,6 +26,12 @@ public sealed partial class PerimeterStatusEvent : Entity
 
     [GeneratedRegex(@"^([a-zA-Z\u00F0-\u02AF0-9 _.-]*), ([Arm|Home|Disarm]*)$")]
     private static partial Regex PerimeterStatusRegex();
+
+    /// <summary>
+    ///     Maps this event to a flat store row.
+    /// </summary>
+    public EventRecord ToRecord(string? rawMessage) =>
+        new(CreatedAt, "PerimeterStatus", EventType.Name, EventType.Value, null, null, Username, rawMessage);
 
     public static bool TryParse(string message, out PerimeterStatusEvent? parsedEvent)
     {
@@ -47,7 +51,10 @@ public sealed partial class PerimeterStatusEvent : Entity
             return false;
         }
 
-        parsedEvent = new PerimeterStatusEvent { CreatedAt = DateTime.Now, Username = userName, EventType = eventType };
+        parsedEvent = new PerimeterStatusEvent
+        {
+            CreatedAt = DateTimeOffset.UtcNow, Username = userName, EventType = eventType
+        };
 
         return true;
     }

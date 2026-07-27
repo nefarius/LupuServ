@@ -4,14 +4,14 @@ using Coravel;
 
 using LupuServ;
 using LupuServ.Invocables;
+using LupuServ.Services;
 using LupuServ.Services.Gateways;
 using LupuServ.Services.Interfaces;
 using LupuServ.Services.Web;
 
 using Microsoft.Extensions.Options;
 
-using MongoDB.Driver;
-using MongoDB.Entities;
+using Npgsql;
 
 using Polly;
 using Polly.Contrib.WaitAndRetry;
@@ -131,10 +131,11 @@ if (gotifyConfig is not null)
     }
 }
 
-// Scheduler
+// Scheduler / queue
 builder.Services.AddScheduler();
 builder.Services.AddQueue();
 builder.Services.AddTransient<GetSensorListInvocable>();
+builder.Services.AddTransient<StoreEventInvocable>();
 
 // SMTP
 builder.Services.AddTransient<IMessageStore, LupusMessageStore>();
@@ -157,22 +158,38 @@ builder.Services.AddSingleton(Policy.RateLimitAsync<SmtpResponse>(1, TimeSpan.Fr
 builder.Services.AddHostedService<StartupService>();
 
 // Database
-string? connectionString = builder.Configuration.GetConnectionString("MongoDB");
+string? connectionString = builder.Configuration.GetConnectionString("Events");
 
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new ArgumentException("Configuration incomplete!");
 }
 
-Log.Logger.Information("Connecting to database");
-
-DB.InitAsync(serviceConfig.DatabaseName, MongoClientSettings.FromConnectionString(connectionString))
-    .GetAwaiter()
-    .GetResult();
-
-Log.Logger.Information("Database connected");
+builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
+builder.Services.AddSingleton<IEventStore, PostgresEventStore>();
 
 IHost host = builder.Build();
+
+host.Services
+    .ConfigureQueue()
+    .OnError(ex => Log.Logger.Error(ex, "Failed to persist queued event"));
+
+// Ensure schema (retry for freshly started or remote Postgres)
+Log.Logger.Information("Connecting to database");
+
+IEventStore eventStore = host.Services.GetRequiredService<IEventStore>();
+Policy
+    .Handle<Exception>()
+    .WaitAndRetry(
+        10,
+        retryAttempt => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(2, retryAttempt))),
+        (ex, delay, attempt, _) =>
+        {
+            Log.Logger.Warning(ex, "Database not ready (attempt {Attempt}), retrying in {Delay}", attempt, delay);
+        })
+    .Execute(() => eventStore.EnsureSchemaAsync().GetAwaiter().GetResult());
+
+Log.Logger.Information("Database connected");
 
 // register scheduled jobs
 host.Services.UseScheduler(scheduler =>
